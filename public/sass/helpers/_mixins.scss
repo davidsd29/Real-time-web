@@ -1,0 +1,120 @@
+@mixin respond-to($media) {
+
+    // Exclusively the requested breakpoint
+    @if $media==only-xs {
+        @media screen and (min-width: 0) and (max-width: ($breakpoint-sm - 1)) {
+            @content;
+        }
+    }
+
+    @else if $media==only-sm {
+        @media screen and (min-width: $breakpoint-sm) and (max-width: ($breakpoint-md - 1)) {
+            @content;
+        }
+    }
+
+    @else if $media==only-md {
+        @media screen and (min-width: $breakpoint-md) and (max-width: ($breakpoint-lg - 1)) {
+            @content;
+        }
+    }
+
+    @else if $media==only-lg {
+        @media screen and (min-width: $breakpoint-lg) and (max-width: ($breakpoint-xl - 1)) {
+            @content;
+        }
+    }
+
+    @else if $media==only-xl {
+        @media screen and (min-width: $breakpoint-xl) {
+            @content;
+        }
+    }
+
+    // Up to and including the requested breakpoint
+    @else if $media==up-to-xs {
+        @media screen and (max-width: ($breakpoint-sm - 1)) {
+            @content;
+        }
+    }
+
+    @else if $media==up-to-sm {
+        @media screen and (max-width: ($breakpoint-md - 1)) {
+            @content;
+        }
+    }
+
+    @else if $media==up-to-md {
+        @media screen and (max-width: ($breakpoint-lg - 1)) {
+            @content;
+        }
+    }
+
+    @else if $media==up-to-lg {
+        @media screen and (max-width: ($breakpoint-xl - 1)) {
+            @content;
+        }
+    }
+
+    // Starting at the requested breakpoint
+    @else if $media==from-sm {
+        @media screen and (min-width: $breakpoint-sm) {
+            @content;
+        }
+    }
+
+    @else if $media==from-md {
+        @media screen and (min-width: $breakpoint-md) {
+            @content;
+        }
+    }
+
+    @else if $media==from-lg {
+        @media screen and (min-width: $breakpoint-lg) {
+            @content;
+        }
+    }
+
+    @else if $media==from-xl {
+        @media screen and (min-width: $breakpoint-xl) {
+            @content;
+        }
+    }
+}
+
+@mixin transition($arguments...) {
+    -webkit-transition: $arguments;
+    -moz-transition: $arguments;
+    -ms-transition: $arguments;
+    -o-transition: $arguments;
+    transition: $arguments;
+}
+
+@mixin transform($arguments...) {
+    transform: $arguments;
+    -ms-transform: $arguments;
+    -moz-transform: $arguments;
+    -webkit-transform: $arguments;
+    -o-transform: $arguments;
+}
+
+@mixin background-size($arguments...) {
+    -webkit-background-size: $arguments;
+    -moz-background-size: $arguments;
+    -o-background-size: $arguments;
+    background-size: $arguments;
+}
+
+@mixin animation($arguments...) {
+    -webkit-animation: $arguments;
+    -moz-animation: $arguments;
+    -ms-animation: $arguments;
+    -o-animation: $arguments;
+    animation: $arguments;
+}
+
+@mixin box-shadow($arguments...) {
+    -moz-box-shadow: $arguments;
+    -webkit-box-shadow: $arguments;
+    box-shadow: $arguments;
+}
