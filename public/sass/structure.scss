@@ -67,8 +67,6 @@ article {
 .drawspace {
 	padding: 2em;
 
-
-
 	p {
 		border-radius: 0.5em;
 		padding: 0.5em 1em;
@@ -143,5 +141,22 @@ article {
 			border-radius: 0 0.4em 0.4em 0;
 			background-color: #fff;
 		}
+	}
+}
+
+.welcome {
+	inset: 0;
+	display: grid;
+	place-items: center;
+	place-content: center;
+	width: 100%;
+	height: 100%;
+	transform: translateY(-100%);
+	transition: all 300ms ease-in-out;
+	background-color: blue;
+	border: 10px solid black;
+
+	&.visible {
+		transform: translateY(0);
 	}
 }
