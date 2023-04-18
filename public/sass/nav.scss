@@ -3,15 +3,41 @@ header {
 	justify-content: space-between;
 	padding: 1em 2em;
 
-    ul {
-        display: flex;
-        gap: 1em;
-        
-        li{
-            display: block;
-            padding: 1em;
-            border-radius: 0.5em;
-            cursor: pointer;
-        }
-    }
+	ul {
+		display: flex;
+		align-items: center;
+		gap: 1em;
+
+		li {
+			display: block;
+			padding: 1em;
+			border-radius: 0.5em;
+			cursor: pointer;
+
+			&:hover {
+				border-bottom: 2px solid color(secondary);
+
+				i {
+					animation: spin 2s infinite linear;
+				}
+			}
+
+			button {
+                display: flex;
+                align-items: center;
+                gap: .8em;
+				background: none;
+				border: none;
+				cursor: inherit;
+
+				i {
+					font-size: 2em !important;
+				}
+
+				span {
+					margin-top: 0.4em;
+				}
+			}
+		}
+	}
 }

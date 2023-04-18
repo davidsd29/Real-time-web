@@ -1,3 +1,5 @@
+import { settings } from './script.js';
+
 let socket = io();
 const chat = {
 	section: document.querySelector('.chat_session'),
@@ -6,10 +8,15 @@ const chat = {
 	input: document.querySelector('#chat input'),
 };
 
-const user = {
-	form: document.querySelector('#name'),
-	input: document.querySelector('#name input'),
-};
+
+settings.button.addEventListener('click', () => {
+	settings.frame.classList.add('visible');
+});
+
+settings.close.addEventListener('click', () => {
+	settings.frame.classList.remove('visible');
+});
+
 
 chat.form.addEventListener('submit', (event) => {
 	event.preventDefault();

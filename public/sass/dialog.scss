@@ -1,0 +1,118 @@
+dialog {
+	display: grid;
+	place-items: center;
+	place-content: center;
+
+	inset: 0;
+	width: 100%;
+	height: 100%;
+
+	transform: translateY(-100%);
+	transition: all 300ms ease-in-out;
+	background-color: seashell;
+
+	&.visible {
+		transform: translateY(0);
+	}
+
+	> p {
+		position: absolute;
+		top: 65%;
+	}
+
+	.loader {
+		position: absolute;
+		width: 12.5em;
+		aspect-ratio: 1;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		margin: auto;
+		border-radius: 50%;
+		box-shadow: 0 0 2em #444;
+
+		&:before {
+			content: '';
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			border-radius: 50%;
+			background: linear-gradient(dodgerblue, white 60%);
+			animation: spin 1.5s infinite linear;
+		}
+
+		&:after {
+			content: '';
+			position: absolute;
+			width: 95%;
+			height: 95%;
+			top: 2.5%;
+			left: 2.5%;
+			background-color: seashell;
+			border-radius: 50%;
+			box-shadow: inset 0 0 5px #444;
+		}
+
+		p {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+
+			text-align: center;
+			font-size: 1.5em;
+			color: inherit;
+			font-weight: 700;
+			z-index: 1;
+		}
+	}
+
+	&.settings {
+		h3 {
+			margin-bottom: 1em;
+		}
+
+		button {
+			position: absolute;
+			top: 10%;
+			right: 10%;
+			padding: 0.5em 1em;
+			aspect-ratio: 1;
+			height: 4em;
+
+			background: none;
+			border: none;
+			cursor: pointer;
+
+			span {
+				display: block;
+				width: 100%;
+				height: 2px;
+				background: color(primary);
+				transition: all 0.5s variable(cubic);
+				transition-delay: 0s;
+
+				&:first-of-type {
+					transform: translateY(4px) rotate(45deg);
+				}
+
+				&:last-of-type {
+					transform: translateY(3px) rotate(-45deg);
+				}
+			}
+
+			&:hover {
+				span {
+					background-color: color(hover);
+				}
+			}
+		}
+	}
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
+	}
+}

@@ -1,9 +1,14 @@
 <header>
-    <h1>Room Number: {{ room_number }}</h1>
-    <nav>
-        <ul>
-            <li><a href="/">Stop Game</a></li>
-            <li><button>Settings</button></li>
-        </ul>
-    </nav>
+	<h1>Room Number: {{room_number}}</h1>
+	<nav>
+		<ul>
+			<li><a href='/'>Stop Game</a></li>
+			<li>
+				<button data-setting-btn>
+					<i class='fa fa-gear'></i>
+					<span>Settings</span>
+				</button>
+			</li>
+		</ul>
+	</nav>
 </header>

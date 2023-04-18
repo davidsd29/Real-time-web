@@ -1,7 +1,9 @@
 
+@import 'helpers/colors';
 @import 'helpers/variables';
 @import 'helpers/mixins';
 @import 'helpers/function';
+
 
 * {
     box-sizing: border-box;
@@ -13,5 +15,6 @@
 @import 'structure';
 @import 'nav';
 @import 'text';
+@import 'dialog';
 @import 'chat';
 @import 'form';

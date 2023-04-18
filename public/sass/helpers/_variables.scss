@@ -1,16 +1,7 @@
-$colors: (
-     primary: #1e1e1e,
-     secondary: black,
-     tertiary: #08fdd8,
-     quaternary: #FFFFFF,
-     button: #2E9BD8,
-     focus: #1B649C,
-     hover: #0dd8e6,
-     active: #0d35e6,
-     indicator: red,
-     highlight: #ccc,
+$variables: (
+	marker_color: 18,
+	cubic: cubic-bezier(0.4, 0.01, 0.165, 0.99),
 );
-
 
 // Media breakpoints
 $breakpoint-sm: 576px;

@@ -1,6 +1,24 @@
 .text {
 	&__big {
-		font-size: 1.75rem;
+		font-size: 2rem;
+		font-weight: 500;
+	}
+
+	&__medium {
+		font-size: 1.5rem;
+		font-weight: 500;
+	}
+}
+
+
+.title {
+	&__big {
+		font-size: 3rem;
+		font-weight: 500;
+	}
+
+	&__medium {
+		font-size: 2.5rem;
 		font-weight: 500;
 	}
 }

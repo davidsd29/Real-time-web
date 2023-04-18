@@ -7,3 +7,12 @@
         @warn "Unknown `#{$key}` in $colors";
         @return null;
 }
+
+@function variable($key) {
+    @if map-has-key($variables, $key) {
+        @return map-get($variables, $key);
+    }
+
+    @warn "Unknown `#{$key}` in $colors";
+    @return null;
+}
