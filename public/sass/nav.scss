@@ -1,0 +1,17 @@
+header {
+	display: flex;
+	justify-content: space-between;
+	padding: 1em 2em;
+
+    ul {
+        display: flex;
+        gap: 1em;
+        
+        li{
+            display: block;
+            padding: 1em;
+            border-radius: 0.5em;
+            cursor: pointer;
+        }
+    }
+}

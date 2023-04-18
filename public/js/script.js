@@ -11,35 +11,24 @@ const user = {
 	input: document.querySelector('#name input'),
 };
 
-user.form.addEventListener('submit', (event) => {
+chat.form.addEventListener('submit', (event) => {
 	event.preventDefault();
-
-	if (event.target.value !== '') {
-		chat.section.classList.remove('hidden');
-		socket.emit('username', user.input.value);
-
-		chat.form.addEventListener('submit', (event) => {
-			event.preventDefault();
-			if (chat.input.value) {
-
-                const chat_bolb = {
-                    user: user.input.value,
-                    message: chat.input.value  
-                } 
-                socket.emit('message', chat_bolb);
-				chat.input.value = '';
-			}
-		});
-	} else {
-		chat.section.classList.add('hidden');
+	let user_name = event.target.querySelector('button').getAttribute('data-host');
+	if (chat.input.value) {
+		const chat_bolb = {
+		    user: user_name,
+		    message: chat.input.value
+		}
+		socket.emit('message', chat_bolb);
+		chat.input.value = '';
 	}
 });
 
-
-
 socket.on('message', (item) => {
 	chat.messages.appendChild(
-		Object.assign(document.createElement('li'), { textContent: `${item.user}: ${item.message}` })
+		Object.assign(document.createElement('li'), {
+			textContent: `${item.user}: ${item.message}`,
+		})
 	);
 	chat.messages.scrollTop = chat.messages.scrollHeight;
 });

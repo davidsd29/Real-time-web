@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    {{> head }}
-</head>
+{{> head }}
+
 
 <body id="main">
+
+    {{> mainHeader }}
     <main>
         {{{body}}}
     </main>
+
+    <footer>
+        <p>© 2023 - Real Time Web</p>
+    </footer>
     
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/script.js" type="module"></script>
-    <script>
-        const socket = io();
-    </script>
+ 
+
 </body>
 
 </html>

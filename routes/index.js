@@ -4,6 +4,7 @@ const router = express.Router();
 
 import { home } from "../controllers/index.js";
 
-router.use('/', home);
+router.get('/', home);
+
 
 export default router;

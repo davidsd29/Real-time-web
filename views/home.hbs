@@ -1,9 +1,23 @@
-<h1>{{title}}</h1>
 
-    <form id="name">
-        <p>Enter your name</p>
-        <input type="text" autocomplete="off">
-        <button>Send</span></button>
+<section class="intro">
+
+</section>
+
+<article>
+    <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. In vulputate ligula eget tristique lacinia. Sed ullamcorper sed
+        ante eu laoreet. Phasellus a efficitur odio. Maecenas fermentum, dui elementum consequat venenatis, ligula risus
+        faucibus mi, non ornare massa lacus id felis. Praesent vitae ultricies enim.
+    </p>
+
+    <form id="user_form" action="/game/{{roomNumber}}" method="POST">
+    <label for="drawing">Drawing</label>
+    <input type="text" id="drawing" name="drawing" placeholder="What do you want to draw?" required autocomplete="off">
+
+
+        <label for="user_name">Name</label>
+        <input type="text" id="user_name" name="user_name" placeholder="Please enter your name" required autocomplete="off">
+        <button>Start Game</button>
     </form>
-
-    {{> chat }}
+    
+</article> 

@@ -23,6 +23,7 @@ app.use(express.json());
 
 // Routes
 import routes from "./routes/index.js";
+import game from "./routes/game.js";
 
 // HBS Setup
 import {engine} from "express-handlebars";
@@ -44,6 +45,7 @@ app.use(express.static("public"));
 
 // Use Routes
 app.use("/", routes);
+app.use("/game", game);
 
 // io.on sets connection event listener on
 io.on('connection', (socket) => {
