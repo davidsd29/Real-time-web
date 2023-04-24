@@ -8,7 +8,6 @@ const chat = {
 	input: document.querySelector('#chat input'),
 };
 
-
 settings.button.addEventListener('click', () => {
 	settings.frame.classList.add('visible');
 });
@@ -17,15 +16,16 @@ settings.close.addEventListener('click', () => {
 	settings.frame.classList.remove('visible');
 });
 
-
 chat.form.addEventListener('submit', (event) => {
 	event.preventDefault();
-	let user_name = event.target.querySelector('button').getAttribute('data-host');
+	let user_name = event.target
+		.querySelector('button')
+		.getAttribute('data-host');
 	if (chat.input.value) {
 		const chat_bolb = {
-		    user: user_name,
-		    message: chat.input.value
-		}
+			user: user_name,
+			message: chat.input.value,
+		};
 		socket.emit('message', chat_bolb);
 		chat.input.value = '';
 	}

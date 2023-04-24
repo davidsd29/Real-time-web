@@ -2,7 +2,13 @@
 	<h1>Draw blank</h1>
 	<nav>
 		<ul>
-			<li><a href='/'>Something</a></li>
+			<li>
+				<form action="/game">
+				<input type="number" name="room_nmbr" placeholder="Enter the room number" required>
+				<input type="text" name="guest" placeholder="Enter your name" required>
+				<button type="submit">Join</button>
+				</form>
+			</li>
 			<li>
 				<button data-setting-btn>
 					<i class='fa fa-gear'></i>
