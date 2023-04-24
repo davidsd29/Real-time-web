@@ -44,7 +44,7 @@ main {
 	flex-wrap: wrap;
 	gap: 2em;
 
-	padding: 1.5em 5em;
+	padding: 0 5em;
 
 	> section:first-of-type,
 	article {
@@ -56,7 +56,8 @@ main {
 		width: 100%;
 		background-color: antiquewhite;
 		border-radius: 0.5em;
-		height: 75vh;
+		height: auto;
+		// height: 80vh;
 	}
 }
 
@@ -73,7 +74,7 @@ article {
 }
 
 .drawspace {
-	padding: 2em;
+	padding: 1.5em 2em;
 
 	p {
 		border-radius: 0.5em;
@@ -90,11 +91,14 @@ article {
 	> div:not(.slider) {
 		display: flex;
 		height: 90%;
+		max-height: 70vh;
 
 		aside {
 			flex-basis: 10vw;
+			min-width: 8vw;
 			flex-grow: 1;
 			height: 100%;
+			max-height: 70vh;
 			overflow-y: scroll;
 			border-radius: 0.4em 0 0 0.4em;
 			background-color: lightgray;
@@ -129,12 +133,12 @@ article {
 								background-color: adjust-hue(#c00808, $step * $i);
 
 								&:hover {
-									box-shadow: inset 0 0 0.5em white,
+									box-shadow: inset 0 0 0.5em color(quaternary),
 										0 0 1em adjust-hue(#c00808, $step * $i);
 								}
 
 								&.active {
-									box-shadow: inset 0 0 0.5em white,
+									box-shadow: inset 0 0 0.5em color(quaternary),
 										0 0 1em adjust-hue(#c00808, $step * $i);
 								}
 							}
@@ -146,7 +150,7 @@ article {
 							background-color: #000;
 
 							&:hover {
-								box-shadow: inset 0 0 0.5em white,
+								box-shadow: inset 0 0 0.5em color(quaternary),
 									0 0 1em color(secondary);
 							}
 						}
@@ -166,13 +170,28 @@ article {
 			}
 		}
 
-		div {
+		.whiteboard {
+			// height: 100%;
+			// 	width: 100%;
+			// 	position: absolute;
+			// 	left: 0;
+			// 	right: 0;
+			// 	bottom: 0;
+			// 	top: 0;
+			// 	background-color: red;
 			flex-grow: 3;
-			height: 100%;
+			height: initial;
 			width: 100%;
 			border-radius: 0 0.4em 0.4em 0;
-			background-color: #fff;
+			background-color: color(quaternary);
 		}
+
+		// div {
+		// 	flex-grow: 3;
+		// 	height: 100%;
+		// 	width: 100%;
+		// 	background-color: #fff;
+		// }
 	}
 
 	.slider {

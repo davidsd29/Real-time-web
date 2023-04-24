@@ -51,11 +51,15 @@ app.use('/game', game);
 io.on('connection', (socket) => {
 	console.log('a user connected');
 
-	socket.on('joinRoom', ({ username, room }) => {
-		const user = userJoin(socket.id, username, room);
+	// socket.on('joinRoom', ({ username, room }) => {
+	// 	const user = userJoin(socket.id, username, room);
 
-		socket.join(user.room);
-	});
+	// 	socket.join(user.room);
+	// });
+
+	socket.on('joinRoom', joinRoom);
+	socket.on('leaveRoom', leaveRoom);
+	socket.on('drawing', (data) => socket.broadcast.emit('drawing', data));
 
 	// io.emit('history', history)
 
@@ -74,6 +78,16 @@ io.on('connection', (socket) => {
 		console.log(user);
 	});
 });
+
+function joinRoom(socket, room) {
+	socket.join(room);
+	socket.emit('joined', room);
+}
+
+function leaveRoom(socket, room) {
+	socket.leave(room);
+	socket.emit('left', room);
+}
 
 server.listen(PORT, () => {
 	console.log(`Example app listening on port ${PORT}`);

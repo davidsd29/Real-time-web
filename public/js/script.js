@@ -9,7 +9,7 @@ export const settings = {
 
 
 setTimeout(() => {
-	welcome_frame.classList.remove('visible');
+	if(welcome_frame) welcome_frame.classList.remove('visible');
 }, 3000);
 
 settings.button.addEventListener('click', () => {
