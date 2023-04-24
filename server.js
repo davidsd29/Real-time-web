@@ -47,18 +47,22 @@ app.use(express.static('public'));
 app.use('/', routes);
 app.use('/game', game);
 
+let numUsers = 0;
+
 // io.on sets connection event listener on
 io.on('connection', (socket) => {
+	let addedUser = false;
 	console.log('a user connected');
 
-	// socket.on('joinRoom', ({ username, room }) => {
-	// 	const user = userJoin(socket.id, username, room);
+	socket.on('player join', (user) => {
+		if (addedUser) return;
+		joinRoom(socket, user, addedUser);
+	});
 
-	// 	socket.join(user.room);
-	// });
+	socket.on('leaveRoom', (user) => {
+		if (addedUser) leaveRoom(socket, user);
+	});
 
-	socket.on('joinRoom', joinRoom);
-	socket.on('leaveRoom', leaveRoom);
 	socket.on('drawing', (data) => socket.broadcast.emit('drawing', data));
 
 	// io.emit('history', history)
@@ -72,21 +76,38 @@ io.on('connection', (socket) => {
 		io.emit('message', message);
 	});
 
+	socket.on('player leave', (user) => {
+		console.log('left');
+		leaveRoom(socket, user);
+	});
+
 	socket.on('disconnect', () => {
-		const user = userLeave(socket.id);
 		console.log('user disconnected');
-		console.log(user);
 	});
 });
 
-function joinRoom(socket, room) {
-	socket.join(room);
-	socket.emit('joined', room);
+function joinRoom(socket, user, addedUser) {
+	// echo globally (all clients) that a person has connected
+	numUsers++;
+	addedUser = true;
+	socket.username = user.name;
+	socket.broadcast.emit('bot message', {
+		participants_amount: numUsers,
+		username: user.name,
+	});
 }
 
-function leaveRoom(socket, room) {
-	socket.leave(room);
-	socket.emit('left', room);
+function leaveRoom(socket, name) {
+	numUsers--;
+	console.log('user left');
+
+	if (numUsers < 0) numUsers = 0;
+
+	// echo globally that this client has left
+	socket.broadcast.emit('user left', {
+		username: name,
+		participants_amount: numUsers,
+	});
 }
 
 server.listen(PORT, () => {

@@ -23,13 +23,20 @@
 		border-bottom: 1px solid #ccc;
 	}
 
+	.log {
+		color: gray;
+		font-size: 70%;
+		margin: 5px;
+		text-align: center;
+	}
+
 	ul {
 		padding: 0.2em;
 		flex-grow: 2;
 		width: inherit;
 		overflow-y: scroll;
 
-		li {
+		li:not(li.log) {
 			position: relative;
 			width: fit-content;
 			height: fit-content;
@@ -51,7 +58,8 @@
 				height: 0;
 			}
 
-			&.left {
+			&.host {
+				right: -5%;
 				background-color: #a8ddfd;
 				box-shadow: 6px 7px 10px -3px #aaa;
 				&::after {
@@ -71,7 +79,8 @@
 				}
 			}
 
-			&.right {
+			&.guest {
+				left: 75%;
 				background-color: #e7f6ff;
 				box-shadow: -6px 7px 10px -3px #aaa;
 				&::after {
@@ -85,7 +94,7 @@
 				&:before {
 					bottom: -1px;
 					right: -1.075em;
-					border-bottom: 1em solid #e7f6ff;
+					border-bottom: 1em solid #97c6e3;
 					border-left: 1em solid transparent;
 					border-right: 1em solid transparent;
 				}

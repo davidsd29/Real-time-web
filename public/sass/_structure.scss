@@ -130,16 +130,16 @@ article {
 					@for $i from 1 through variable(marker_color) {
 						&:nth-of-type(#{$i}) {
 							button {
-								background-color: adjust-hue(#c00808, $step * $i);
+								background-color: adjust-hue(#ff0000, $step * $i);
 
 								&:hover {
 									box-shadow: inset 0 0 0.5em color(quaternary),
-										0 0 1em adjust-hue(#c00808, $step * $i);
+										0 0 1em adjust-hue(#ff0000, $step * $i);
 								}
 
 								&.active {
 									box-shadow: inset 0 0 0.5em color(quaternary),
-										0 0 1em adjust-hue(#c00808, $step * $i);
+										0 0 1em adjust-hue(#ff0000, $step * $i);
 								}
 							}
 						}

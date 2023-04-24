@@ -10,6 +10,7 @@ dialog {
 	transform: translateY(-100%);
 	transition: all 300ms ease-in-out;
 	background-color: seashell;
+	z-index: 1;
 
 	&.visible {
 		transform: translateY(0);
