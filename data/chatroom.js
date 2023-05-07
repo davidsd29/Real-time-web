@@ -1,1 +1,1 @@
-export const chat_rooms = [] 
+export const chat_rooms = [];

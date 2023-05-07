@@ -10,14 +10,16 @@
         faucibus mi, non ornare massa lacus id felis. Praesent vitae ultricies enim.
     </p>
 
-    <form id="user_form" action="/game/{{roomNumber}}" method="POST">
-    <label for="drawing">Drawing</label>
-    <input type="text" id="drawing" name="drawing" placeholder="What do you want to draw?" required autocomplete="off">
+    <form id="host_form" action="/game/{{roomNumber}}" method="POST">
+    <label for="red">Red</label>
+    <input type="radio" name="team" id="red">
+    <label for="blue">Blue</label>
+    <input type="radio" name="team" id="blue">
 
 
         <label for="user_name">Name</label>
         <input type="text" id="user_name" name="user_name" placeholder="Please enter your name" required autocomplete="off">
-        <button class="btn">Start Game</button>
+        <button type="submit" data-room="{{roomNumber}}">Join</button>
     </form>
     
 </article> 

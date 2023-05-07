@@ -13,11 +13,32 @@ const guest = {
 	room: document.querySelector('#join_form input[type="number"]'),
 };
 
+const host = {
+	form: document.querySelector('#host_form'),
+	name: document.querySelector('#host_form input[type="text"]'),
+	submit: document.querySelector('#host_form button[type="submit"]'),
+};
+
+if (host.form) {
+	host.submit.addEventListener('click', (event) => {
+		// event.preventDefault();
+		// Whenever the server emits 'user joined', log it in the chat body
+		if (host.name.value) {
+			const player = {
+				name: host.name.value,
+				room: event.target.getAttribute('data-room'),
+			};
+			
+			console.log('player join', player);
+			socket.emit('player join', player);
+		}
+	});
+}
+
 if (guest.form) {
 	guest.form.addEventListener('submit', (event) => {
 		// Whenever the server emits 'user joined', log it in the chat body
 		if (guest.name.value && guest.room.value) {
-			console.log(guest.name.value);
 			const player = {
 				name: guest.name.value,
 				room: guest.room.value,

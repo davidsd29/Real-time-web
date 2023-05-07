@@ -1,14 +1,19 @@
 const brush = {
+	pallet: document.querySelector('.drawspace aside'),
 	color: document.querySelectorAll('[data-brush-color]'),
 	slider: document.querySelector('[data-brush-slider]'),
 	value: document.querySelector('[data-brush-value]'),
 };
 
 const canvas = document.querySelector('canvas');
+
 const canvasContex = canvas.getContext('2d');
+const drawWord = document.querySelector('[data-draw-word]');
 
 let currntColor = 'black';
 let isDrawing = false;
+let mayDraw = false;
+let word = '';
 let lineWidth = 2;
 let mouseVector = { x: 0, y: 0 };
 
@@ -80,6 +85,7 @@ function getMousePos(e) {
 }
 
 function onMouseMove(e) {
+	qqq;
 	// Check if user is drawing
 	if (!isDrawing) return;
 	console.log(
@@ -100,6 +106,19 @@ function onMouseMove(e) {
 		lineWidth,
 		true
 	);
+}
+
+// limit the number of events per second
+function throttle(callback, delay) {
+	var previousCall = new Date().getTime();
+	return function () {
+		var time = new Date().getTime();
+
+		if (time - previousCall >= delay) {
+			previousCall = time;
+			callback.apply(null, arguments);
+		}
+	};
 }
 
 function stopDrawing(e) {
@@ -135,7 +154,41 @@ brush.color.forEach((pallet) => {
 	});
 });
 
-canvas.addEventListener('mousedown', getMousePos);
-canvas.addEventListener('mouseup', stopDrawing);
-canvas.addEventListener('mouseout', stopDrawing); // if the user leaves the canvas, stop drawing
-canvas.addEventListener('mousemove', onMouseMove);
+socket.on('drawWord', (answer) => {
+	word = answer;
+
+});
+
+socket.on('activePlayer', (player) => {
+	canvasContex.clearRect(0, 0, canvas.width, canvas.height);
+	console.log('active player: ' + player.active);
+	console.log('your id: ' + player.random);
+	if (player.active == player.random) {
+		//if you are the player
+		console.log('you are the player');
+		mayDraw = true;
+		// Show the drawing options and answer
+		brush.pallet.classList.remove('hidden');
+		console.log('word: ' + word);
+		drawWord.textContent = `${word}`.toUpperCase();
+
+		// Add the option to draw
+		canvas.addEventListener('mousedown', getMousePos);
+		canvas.addEventListener('mousemove', throttle(onMouseMove, 1));
+		canvas.addEventListener('mouseup', stopDrawing);
+		canvas.addEventListener('mouseout', stopDrawing);
+
+	} else {
+		mayDraw = false;
+		drawWord.textContent = 'Can you guess the word?';
+		// Remove the option to draw
+		canvas.removeEventListener('mousedown', getMousePos);
+		canvas.removeEventListener('mousemove', throttle(onMouseMove, 1));
+		canvas.removeEventListener('mouseup', stopDrawing);
+		canvas.removeEventListener('mouseout', stopDrawing);
+
+		// Hide the drawing options and answer
+		if (brush.pallet.classList.contains('hidden')) return;
+		brush.pallet.classList.add('hidden');
+	}
+});

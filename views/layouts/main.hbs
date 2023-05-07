@@ -5,8 +5,15 @@
 
 
 <body id="main">
-    {{> welcome }}
-    {{> mainHeader }}
+
+    {{#if game}}
+        {{> gameHeader }}
+
+    {{else}}
+        {{> welcome }}
+        {{> mainHeader }}
+    {{/if}}
+
     <main>
         {{{body}}}
     </main>
@@ -14,9 +21,13 @@
     {{!-- <footer>
         <p>© 2023 - Real Time Web</p>
     </footer> --}}
-    
+  
  
-    <script src="/js/script.js" type="module"></script>
+    <script src="/js/chat.js" type="module"></script>
+    {{#if game}}
+        <script src="/js/draw.js" type="module"></script>
+    {{/if}}
+
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();

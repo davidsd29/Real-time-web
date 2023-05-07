@@ -6,7 +6,14 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { Server } from 'socket.io';
-import { userJoin, userLeave } from './public/js/users.js';
+import formatMessage from './utils/message.js';
+import pickRandomWord from './controllers/generateWord.js';
+import {
+	userJoin,
+	getRoomUsers,
+	getCurrentUser,
+	chooseActivePlayer,
+} from './utils/users.js';
 import http from 'http';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -28,6 +35,7 @@ import game from './routes/game.js';
 
 // HBS Setup
 import { engine } from 'express-handlebars';
+import { Console } from 'console';
 
 app.engine(
 	'hbs',
@@ -48,66 +56,93 @@ app.use('/', routes);
 app.use('/game', game);
 
 let numUsers = 0;
-
+const botName = 'Scribble Bot';
 // io.on sets connection event listener on
 io.on('connection', (socket) => {
-	let addedUser = false;
 	console.log('a user connected');
 
-	socket.on('player join', (user) => {
-		if (addedUser) return;
-		joinRoom(socket, user, addedUser);
+	socket.on('joinRoom', (player) => {
+		console.log('player join', player);
+		const user = userJoin(socket.id, player.name, player.room);
+
+		socket.join(user.room);
+
+		// Welcome current user
+		socket.emit(
+			'message',
+			formatMessage(botName, 'Welcome to Scribble Tittle Tattle!')
+		);
+
+		numUsers++;
+
+		// broadcast globally (all clients) that a person has connected to a specific room
+		socket.broadcast.emit(
+			'message',
+			formatMessage(botName, `${user.username} has joined the chat`)
+		);
+
+		// Send users and room info
+		io.to(user.room).emit('roomUsers', {
+			room: user.room,
+			users: getRoomUsers(user.room),
+			participants_amount: numUsers,
+		});
 	});
 
-	socket.on('leaveRoom', (user) => {
-		if (addedUser) leaveRoom(socket, user);
-	});
+	// 	socket.on('leaveRoom', (user) => {
+	// 		if (addedUser) leaveRoom(socket, user);
+	// 	});
 
 	socket.on('drawing', (data) => socket.broadcast.emit('drawing', data));
 
-	// io.emit('history', history)
+	// 	// io.emit('history', history)
 
-	socket.on('message', (message) => {
+	socket.on('chatMessage', (message) => {
 		// while (history.length > historySize) {
 		//   history.shift()
 		// }
 		// history.push(message)
 
-		io.emit('message', message);
+		io.emit('message', formatMessage(message.user, message.text));
 	});
 
-	socket.on('player leave', (user) => {
-		console.log('left');
-		leaveRoom(socket, user);
+	socket.on('newRound', (roomNumber) => {
+		newRound(socket, roomNumber);
 	});
 
-	socket.on('disconnect', () => {
-		console.log('user disconnected');
+	// Runs when client disconnects
+	socket.on('leaving', (leaving) => {
+		const user = getCurrentUser(socket.id, leaving);
+		console.log(user);
+		if (user.length > 0) {
+			console.log('user disconnected ' + socket.id);
+			socket.broadcast.emit(
+				// io.to(user.room).emit(
+				'message',
+				formatMessage(botName, `${user[0].username} has left the chat`)
+			);
+		}
 	});
 });
 
-function joinRoom(socket, user, addedUser) {
-	// echo globally (all clients) that a person has connected
-	numUsers++;
-	addedUser = true;
-	socket.username = user.name;
-	socket.broadcast.emit('bot message', {
-		participants_amount: numUsers,
-		username: user.name,
-	});
-}
+function newRound(socket, room) {
+	if (getRoomUsers(room).length > 2) {
+		socket.nickname = chooseActivePlayer(room);
+		let activePlayer = chooseActivePlayer(room); // Make a new active player randomly
+		const randomWord = pickRandomWord();
+		
+		io.emit('drawWord', randomWord); // Give the word to all the sockets
+		console.log(socket.nickname);
 
-function leaveRoom(socket, name) {
-	numUsers--;
-	console.log('user left');
-
-	if (numUsers < 0) numUsers = 0;
-
-	// echo globally that this client has left
-	socket.broadcast.emit('user left', {
-		username: name,
-		participants_amount: numUsers,
-	});
+		const players = {
+			active: socket.nickname,
+			random: activePlayer,
+		};
+		socket.broadcast.emit('activePlayer', players); // Give the active player to all the sockets
+		console.log('De actieve speler is: ', activePlayer);
+	} else {
+		console.log('Not enough players');
+	}
 }
 
 server.listen(PORT, () => {
