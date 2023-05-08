@@ -28,6 +28,7 @@ router
 		chat_rooms.push({
 			room_number: req.params.roomNumber,
 			host: req.body.user_name,
+			team: req.body.team,
 			players: [],
 		});
 

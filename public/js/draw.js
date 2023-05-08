@@ -1,3 +1,5 @@
+let socket = io();
+
 const brush = {
 	pallet: document.querySelector('.drawspace aside'),
 	color: document.querySelectorAll('[data-brush-color]'),
@@ -5,6 +7,7 @@ const brush = {
 	value: document.querySelector('[data-brush-value]'),
 };
 
+const clientBtn = document.querySelector('[data-host]');
 const canvas = document.querySelector('canvas');
 
 const canvasContex = canvas.getContext('2d');
@@ -17,6 +20,10 @@ let word = '';
 let lineWidth = 2;
 let mouseVector = { x: 0, y: 0 };
 
+let startDrawing;
+let stopDrawing;
+let onMouseMove;
+
 const mouseCanvasLocation = (e, axis) => {
 	const rect = canvas.getBoundingClientRect();
 	if (axis == 'x') {
@@ -24,89 +31,78 @@ const mouseCanvasLocation = (e, axis) => {
 	} else return Math.floor(e.clientY - rect.top);
 };
 
-socket.on('drawing', onDrawingEvent);
 
-function drawLine(
-	startX,
-	startY,
-	mouseMoveX,
-	mouseMoveY,
-	color,
-	brushSize,
-	emit
-) {
-	// Create a new path
+// if user starts drawing
+socket.on('startDrawing', (coordinates) => {
+	console.log('start drawing')
+	isDrawing = true;
+	mouseVector = { x: coordinates[0], y: coordinates[1] };
+});
+
+// if user is drawing
+socket.on('move', (coordinates) => {
+	if (!isDrawing) return;
+	drawLine(coordinates, currntColor, lineWidth);
+});
+
+// if user stops drawing
+socket.on('stopDrawing', (coordinates) => {
+	if (!isDrawing) return;
+	isDrawing = false;
+	mouseVector = { x: coordinates[0], y: coordinates[1] };
+	drawLine(coordinates, currntColor, lineWidth);
+});
+
+function drawLine(coordinates, currentColor, brushSize) {
+	if (isDrawing) {
+		canvasContex.beginPath();
+		canvasContex.strokeStyle = currentColor;
+		canvasContex.lineWidth = brushSize;
+
+		canvasContex.moveTo(mouseVector.x, mouseVector.y);
+		canvasContex.lineTo(coordinates[0], coordinates[1]);
+		canvasContex.stroke();
+
+		mouseVector = { x: coordinates[0], y: coordinates[1] };
+
+		socket.emit('drawing', {
+			x: coordinates[0],
+			y: coordinates[1],
+			color: currentColor,
+			brushSize: brushSize,
+		});
+
+		socket.on('drawing', drawEvent);
+	}
+};
+
+
+function drawEvent(draw) {
+	const { x, y, color, stroke } = draw;
+
 	canvasContex.beginPath();
-
+	canvasContex.moveTo(x, y);
+	canvasContex.lineTo(x, y);
 	canvasContex.strokeStyle = color;
-	canvasContex.lineWidth = brushSize;
-
-	// Set the line cordinates
-	canvasContex.moveTo(startX, startY);
-	canvasContex.lineTo(mouseMoveX, mouseMoveY);
-
-	// Draw the line
+	canvasContex.lineWidth = stroke;
 	canvasContex.stroke();
 	canvasContex.closePath();
-
-	if (!emit) return;
-
-	socket.emit('drawing', {
-		x0: startX / canvas.width,
-		y0: startY / canvas.height,
-		x1: mouseMoveX / canvas.width,
-		y1: mouseMoveY / canvas.height,
-		color: currntColor,
-		lineWidth: lineWidth,
-	});
 }
 
-function onDrawingEvent(data) {
-	drawLine(
-		data.x0 * canvas.width,
-		data.y0 * canvas.height,
-		data.x1 * canvas.width,
-		data.y1 * canvas.height,
-		data.color,
-		data.brushSize
-	);
-}
+// function getMousePos(e) {
+// 	isDrawing = true;
+// 	var rect = canvas.getBoundingClientRect();
 
-function getMousePos(e) {
-	isDrawing = true;
-	var rect = canvas.getBoundingClientRect();
+// 	console.log(rect);
+// 	// Store the mouse cordinates
+// 	// mouseVector.x = mouseCanvasLocation(e, 'x');
+// 	// mouseVector.y = mouseCanvasLocation(e, 'y');
+// 	mouseVector.x = e.clientX;
+// 	mouseVector.y = e.clientY;
 
-	console.log(rect);
-	// Store the mouse cordinates
-	mouseVector.x = mouseCanvasLocation(e, 'x');
-	mouseVector.y = mouseCanvasLocation(e, 'y');
+// 	console.log('mouse start: x: ' + mouseVector.x, ' y: ' + mouseVector.y);
+// }
 
-	console.log('mouse start: x: ' + mouseVector.x, ' y: ' + mouseVector.y);
-}
-
-function onMouseMove(e) {
-	qqq;
-	// Check if user is drawing
-	if (!isDrawing) return;
-	console.log(
-		'mouse is moving:  x:' + mouseCanvasLocation(e, 'x'),
-		' y: ' + mouseCanvasLocation(e, 'y')
-	);
-	// console.log("brush color: " + currntColor)
-	// console.log("brush size: " + lineWidth)
-
-	// Send the mouse movement data and event cordinates to the server and draw the line
-	// Starts drawring from mouse position
-	drawLine(
-		mouseVector.x,
-		mouseVector.y,
-		mouseCanvasLocation(e, 'x'),
-		mouseCanvasLocation(e, 'y'),
-		currntColor,
-		lineWidth,
-		true
-	);
-}
 
 // limit the number of events per second
 function throttle(callback, delay) {
@@ -121,21 +117,6 @@ function throttle(callback, delay) {
 	};
 }
 
-function stopDrawing(e) {
-	if (!isDrawing) return; // if the user is not drawing, then return
-	isDrawing = false;
-
-	// Send last coordinates for drawing
-	drawLine(
-		mouseVector.x,
-		mouseVector.y,
-		mouseCanvasLocation(e, 'x'),
-		mouseCanvasLocation(e, 'y'),
-		currntColor,
-		lineWidth,
-		true
-	);
-}
 
 brush.slider.addEventListener('input', () => {
 	brush.value.textContent = brush.slider.value;
@@ -156,14 +137,18 @@ brush.color.forEach((pallet) => {
 
 socket.on('drawWord', (answer) => {
 	word = answer;
-
 });
 
 socket.on('activePlayer', (player) => {
 	canvasContex.clearRect(0, 0, canvas.width, canvas.height);
-	console.log('active player: ' + player.active);
-	console.log('your id: ' + player.random);
-	if (player.active == player.random) {
+
+	// let clients = io.sockets.adapter.rooms[player.room];
+	// console.log(clients);
+	console.log('Client name' + clientBtn.getAttribute('data-host'));
+	console.log('player id: ' + player.username);
+	const clientName = clientBtn.getAttribute('data-host');
+
+	if (clientName === player.username) {
 		//if you are the player
 		console.log('you are the player');
 		mayDraw = true;
@@ -172,17 +157,40 @@ socket.on('activePlayer', (player) => {
 		console.log('word: ' + word);
 		drawWord.textContent = `${word}`.toUpperCase();
 
-		// Add the option to draw
-		canvas.addEventListener('mousedown', getMousePos);
-		canvas.addEventListener('mousemove', throttle(onMouseMove, 1));
-		canvas.addEventListener('mouseup', stopDrawing);
-		canvas.addEventListener('mouseout', stopDrawing);
+		startDrawing = (event) => {
+			console.log(
+				'mouse starts at:  x:' + event.clientX,
+				' y: ' + event.clientY
+			);
 
+			// socket.emit('startDrawing', [event.offsetX, event.offsetY]);
+			socket.emit('startDrawing', [mouseCanvasLocation(event, 'x'), mouseCanvasLocation(event, 'y')]);
+		};
+
+		stopDrawing = (event) => {
+			// socket.emit('stopDrawing', [event.offsetX, event.offsetY]);
+			socket.emit('stopDrawing', [mouseCanvasLocation(event, 'x'), mouseCanvasLocation(event, 'y')]);
+
+		};
+
+		onMouseMove = (event) => {
+			if(!isDrawing) return;
+			// socket.emit('move', [event.offsetX, event.offsetY]);
+			socket.emit('move', [mouseCanvasLocation(event, 'x'), mouseCanvasLocation(event, 'y')]);
+			
+		};
+
+		// Add the option to draw
+		// canvas.addEventListener('mousedown', getMousePos);
+		canvas.addEventListener('mousedown', startDrawing, false);
+		canvas.addEventListener('mousemove', throttle(onMouseMove, 1), false);
+		canvas.addEventListener('mouseup', stopDrawing, false);
+		canvas.addEventListener('mouseout', stopDrawing, false);
 	} else {
 		mayDraw = false;
 		drawWord.textContent = 'Can you guess the word?';
 		// Remove the option to draw
-		canvas.removeEventListener('mousedown', getMousePos);
+		canvas.removeEventListener('mousedown', startDrawing);
 		canvas.removeEventListener('mousemove', throttle(onMouseMove, 1));
 		canvas.removeEventListener('mouseup', stopDrawing);
 		canvas.removeEventListener('mouseout', stopDrawing);

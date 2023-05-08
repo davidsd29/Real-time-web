@@ -1,8 +1,20 @@
 const users = [];
 
 // Join user to chat
-function userJoin(id, username, room) {
-	const user = { id, username, room };
+function userJoin(id, username, room, team) {
+	if (team === undefined) {
+		const blueTeam = users.filter((user) => user.team === 'blue');
+		const redTeam = users.filter((user) => user.team === 'red');
+
+		if (blueTeam.length > redTeam.length) {
+			team = 'red';
+		} else if (blueTeam.length < redTeam.length) {
+			team = 'blue';
+		} else {
+			team = team[Math.floor(Math.random() * team.length)];
+		}
+	}
+	const user = { id, username, room, team };
 
 	users.push(user);
 	console.log(users);
@@ -27,7 +39,7 @@ function chooseActivePlayer(room) {
 		const roomUsers = getRoomUsers(room);
 		const activePlayer =
 			roomUsers[Math.floor(Math.random() * roomUsers.length)];
-		return activePlayer.username;
+		return activePlayer;
 	}
 }
 

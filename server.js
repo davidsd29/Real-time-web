@@ -63,7 +63,7 @@ io.on('connection', (socket) => {
 
 	socket.on('joinRoom', (player) => {
 		console.log('player join', player);
-		const user = userJoin(socket.id, player.name, player.room);
+		const user = userJoin(socket.id, player.name, player.room, player.team);
 
 		socket.join(user.room);
 
@@ -93,9 +93,25 @@ io.on('connection', (socket) => {
 	// 		if (addedUser) leaveRoom(socket, user);
 	// 	});
 
-	socket.on('drawing', (data) => socket.broadcast.emit('drawing', data));
+	// socket.on('drawing', (data) => socket.broadcast.emit('drawing', data));
 
 	// 	// io.emit('history', history)
+
+	socket.on('drawing', (draw) => {
+		io.emit('draw', draw);
+	});
+
+	socket.on('startDrawing', (coord) => {
+		io.emit('startDrawing', coord);
+	});
+
+	socket.on('stopDrawing', (coord) => {
+		io.emit('stopDrawing', coord);
+	});
+
+	socket.on('move', (coord) => {
+		io.emit('move', coord);
+	});
 
 	socket.on('chatMessage', (message) => {
 		// while (history.length > historySize) {
@@ -103,7 +119,11 @@ io.on('connection', (socket) => {
 		// }
 		// history.push(message)
 
-		io.emit('message', formatMessage(message.user, message.text));
+		io.emit(
+			'message',
+			formatMessage(message.user, message.text),
+			message.room, message.team
+		);
 	});
 
 	socket.on('newRound', (roomNumber) => {
@@ -127,18 +147,17 @@ io.on('connection', (socket) => {
 
 function newRound(socket, room) {
 	if (getRoomUsers(room).length > 2) {
-		socket.nickname = chooseActivePlayer(room);
+		// socket.nickname = chooseActivePlayer(room);
 		let activePlayer = chooseActivePlayer(room); // Make a new active player randomly
 		const randomWord = pickRandomWord();
-		
-		io.emit('drawWord', randomWord); // Give the word to all the sockets
-		console.log(socket.nickname);
 
-		const players = {
-			active: socket.nickname,
-			random: activePlayer,
-		};
-		socket.broadcast.emit('activePlayer', players); // Give the active player to all the sockets
+		io.emit('drawWord', randomWord); // Give the word to all the sockets
+
+		// const players = {
+		// 	active: socket.nickname,
+		// 	random: activePlayer,
+		// };
+		socket.broadcast.emit('activePlayer', activePlayer); // Give the active player to all the sockets
 		console.log('De actieve speler is: ', activePlayer);
 	} else {
 		console.log('Not enough players');

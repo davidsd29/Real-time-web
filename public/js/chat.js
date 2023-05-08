@@ -16,6 +16,7 @@ const chat = {
 const start = {
 	form: document.querySelector('#host_form'),
 	name: document.querySelector('#host_form input[type="text"]'),
+	team: document.querySelector('#host_form input[type="radio"]'),
 	submit: document.querySelector('#host_form button[type="submit"]'),
 };
 
@@ -37,20 +38,21 @@ const updateParticipantsAmount = (data) => {
 	}
 };
 
-const checkAwnser = (message) => {
-	if (message.toLowerCase() == drawWord.textContent.toLowerCase()) {
+const checkAwnser = (message, roomNumber) => {
+	if (message.text.toLowerCase() == drawWord.textContent.toLowerCase()) {
 		// celebrate the winner
-		console.log('You guessed it!');
-		socket.emit('newRound');
+		console.log(`winner is ${message.username} from team ${message.team}`);
+		
+		socket.emit('newRound', roomNumber);
 	}
 };
 
-function addMessageElement(message) {
+function addMessageElement(message, roomNumber, team) {
 	const chat_message = document.createElement('li');
 	chat_message.innerHTML = `<p>${message.username} <span>${message.time}</span> <p>
 		<p class='test'>${message.text}</p>`;
 
-	checkAwnser(message.text);
+	checkAwnser(message, roomNumber, team);
 
 	if (message.username === host) {
 		chat_message.classList.add('host');
@@ -77,13 +79,13 @@ const log = (message) => {
 // 	settings.frame.classList.remove('visible');
 // });
 
-socket.on('message', (message) => {
+socket.on('message', (message, roomNumber, team) => {
 	let botMessage = message.username.includes('Bot');
 	if (botMessage) {
 		log(message.text);
 		return;
 	} else {
-		addMessageElement(message);
+		addMessageElement(message, roomNumber, team);
 	}
 
 	chat.messages.scrollTop = chat.messages.scrollHeight;
@@ -92,18 +94,17 @@ socket.on('message', (message) => {
 
 if (start.form) {
 	start.submit.addEventListener('click', (event) => {
-		// event.preventDefault();
 		// Whenever the server emits 'user joined', log it in the chat body
 		if (start.name.value) {
 			const player = {
 				name: start.name.value,
+				team: start.team.value,
 				room: event.target.getAttribute('data-room'),
 			};
 
 			console.log('joinRoom', player);
 			socket.emit('joinRoom', player);
 			socket.emit('newRound', player.room);
-			// host.form.submit();
 		}
 	});
 
@@ -137,11 +138,15 @@ if (chat.leave) {
 		let user_name = event.target
 			.querySelector('button')
 			.getAttribute('data-host');
-		host = user_name;
+
+			host = user_name;
+		 
 		if (chat.input.value) {
 			const chat_bolb = {
 				user: user_name,
 				text: chat.input.value,
+				room: event.target.querySelector('button').getAttribute('data-room-number'),
+				team: event.target.querySelector('button').getAttribute('data-team'),
 			};
 
 			// Tell the server your username and message
