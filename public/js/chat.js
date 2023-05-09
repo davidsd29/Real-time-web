@@ -1,3 +1,5 @@
+import { startTimer } from './timer.js';
+
 let socket = io();
 let host = '';
 
@@ -11,6 +13,8 @@ const chat = {
 	input: document.querySelector('#chat input'),
 	participants: document.querySelector('.chat_session [data-participants]'),
 	leave: document.querySelector('[data-leave]'),
+	toggle: document.querySelector('[data-chat-toggle]'),
+	indicator: document.querySelector('[data-message-indicator]'),
 };
 
 const start = {
@@ -49,6 +53,9 @@ const popUp = {
 	correct: document.querySelector('[data-popup-correct]'),
 	notValid: document.querySelector('[data-notValid]'),
 };
+
+const timer = document.querySelector('[data-timer]');
+
 setTimeout(() => {
 	if (welcome_frame !== null) welcome_frame.classList.remove('visible');
 }, 3000);
@@ -92,6 +99,14 @@ function addMessageElement(message, roomNumber, team) {
 	}
 
 	chat.messages.appendChild(chat_message);
+
+	if (chat.toggle.checked) {
+		if (!chat.indicator.classList.contains('hidden')) chat.indicator.classList.add('hidden');
+		chat.indicator.textContent = 0;
+	} else {
+		chat.indicator.classList.remove('hidden');
+		chat.indicator.textContent = Number(chat.indicator.textContent) + 1;
+	}
 }
 
 const log = (message) => {
@@ -102,29 +117,45 @@ const log = (message) => {
 	if (chat.messages) chat.messages.appendChild(bot_message);
 };
 
-socket.on('message', (message, roomNumber, team) => {
-	let botMessage = message.username.includes('Bot');
-	if (botMessage) {
-		log(message.text);
-		return;
-	} else {
-		addMessageElement(message, roomNumber, team);
-	}
+socket
+	.on('message', (message, roomNumber, team) => {
+		let botMessage = message.username.includes('Bot');
+		if (botMessage) {
+			log(message.text);
+			return;
+		} else {
+			addMessageElement(message, roomNumber, team);
+		}
 
-	chat.messages.scrollTop = chat.messages.scrollHeight;
-});
+		chat.messages.scrollTop = chat.messages.scrollHeight;
+	})
 
-socket.on('roomExists', (exist, player) => {
-	if (exist) {
-		socket.emit('joinRoom', player);
-		guest.form.submit();
-	} else {
-		popUp.notValid.classList.remove('hidden');
-		setTimeout(() => {
-			popUp.notValid.classList.add('hidden');
-		}, 4000);
-	}
-});
+	.on('startTimer', (start) => {
+		if (start) {
+			startTimer(30, socket);
+		}
+	})
+
+	.on('timer', (time) => {
+		timer.textContent = time;
+		if (time < 10) {
+			timer.classList.add('contdown');
+		} else {
+			timer.classList.remove('contdown');
+		}
+	})
+
+	.on('roomExists', (exist, player) => {
+		if (exist) {
+			socket.emit('joinRoom', player);
+			guest.form.submit();
+		} else {
+			popUp.notValid.classList.remove('hidden');
+			setTimeout(() => {
+				popUp.notValid.classList.add('hidden');
+			}, 4000);
+		}
+	});
 
 if (start.form) {
 	start.submit.addEventListener('click', (event) => {

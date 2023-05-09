@@ -1,11 +1,19 @@
 
 {{> settings }}
 <section class="drawspace">
-    <div class="meta">
+    <div class="meta text text__normal">
         <p>Drawing: <span class="draw_word" data-draw-word></span></p>
-        <span data-timer>30</span>
+       <p>Timer: <span data-timer>30</span></p> 
     </div>
+
     <div>
+        <div class="brush" data-brush>
+            <button data-brush-btn><i class="fa fa-paint-brush"></i></button>
+            <div class="slider hidden" data-brush-option>
+                <label for="brush_size">Size: <span data-brush-value>2</span></label>
+                <input type="range" min="1" max="10" value="2" id="brush_size" data-brush-slider>
+            </div>
+        </div>
         <aside>
             <ul>
                 <li><button data-brush-color></button></li>
@@ -34,10 +42,7 @@
         {{!-- <div></div> --}}
     </div>
 
-<div class="slider">
-    <label for="brush_size">Brush size: <span data-brush-value>2</span></label>
-    <input type="range" min="1" max="10" value="2" id="brush_size" data-brush-slider>
-</div>
+
 
 </section>
 

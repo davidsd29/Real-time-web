@@ -1,38 +1,36 @@
 .hidden {
-	display: none;
+	display: none !important;
 }
 
 .btn {
 	width: fit-content;
-	background-color: color(button);
-	color: color(quaternary);
+	color: color(button);
 	padding: 0.8em 1.2em;
 	margin: 8px 0;
 	border: none;
+
+	background: url('../img/frame.png');
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: contain;
 	cursor: pointer;
 	transition: 0.3s;
 
+	&:hover {
+		transform: scale(1.5);
+		filter: hue-rotate(45deg);
+	}
+
 	&__cancel {
-		background-color: color(quaternary);
-		border: 2px solid color(button);
-		color: color(button);
+		color: color(error);
 
 		&:hover {
-			color: color(quaternary);
+			filter: hue-rotate(300deg);
 		}
 	}
 
-	&:hover {
-		border-radius: 0.4em;
-		background-color: color(hover);
-	}
-
 	&:active {
-		background-color: color(active);
-	}
-
-	&:hover {
-		background-color: dodgerblue;
+		filter: hue-rotate(90deg);
 	}
 
 	&:active {
@@ -45,31 +43,36 @@
 	}
 
 	&:focus {
-		color: color(quaternary);
-		background-color: color(focus);
+		filter: hue-rotate(90deg);
 	}
 }
 
 main {
 	display: flex;
-	align-items: center;
+	align-items: start;
+	justify-content: space-evenly;
 	flex-wrap: wrap;
 	gap: 2em;
+	overflow-x: hidden;
 
 	padding: 0 5em;
 
-	> section:first-of-type,
+	> .intro,
 	article {
 		flex-basis: 30em;
 	}
 
-	> section:first-of-type {
+	.intro {
 		flex-grow: 2;
 		width: 100%;
-		background-color: antiquewhite;
 		border-radius: 0.5em;
 		height: auto;
+		text-align: center;
 		// height: 80vh;
+
+		img {
+			filter: invert(1);
+		}
 	}
 }
 
@@ -81,12 +84,34 @@ article {
 		border-radius: 0.5em;
 		padding: 2em;
 		margin-bottom: 1em;
-		background-color: antiquewhite;
+		border: 0.2em solid color(secondary);
+		transform: skewX(10deg);
+		font-weight: 600;
+		letter-spacing: 2px;
 	}
 }
 
+@keyframes pulse-timer {
+	0% {
+		transform: scale(0.85);
+		color: color(secondary);
+	}
+
+	50% {
+		transform: scale(1.4);
+		color: color(error);
+	}
+}
+
+.countdown {
+	animation-name: pulse-timer;
+	animation-duration: 1s;
+	animation-iteration-count: infinite;
+	animation-timing-function: ease-in-out;
+}
+
 .drawspace {
-	padding: 1.5em 2em;
+	width: 100vw;
 
 	.meta {
 		display: flex;
@@ -105,7 +130,72 @@ article {
 		}
 	}
 
-	> div:not(.slider) {
+	.brush {
+		position: absolute;
+		top: 2%;
+		left: 12%;
+
+		button {
+			border-radius: 50%;
+			background: none;
+			border: 2px solid color(secondary);
+			height: 2em;
+			aspect-ratio: 1;
+			cursor: pointer;
+			transition: 1s;
+
+			&:hover {
+				transform: scale(1.2);
+			}
+		}
+
+		.slider {
+			display: flex;
+			align-items: center;
+			margin-top: 1em;
+			transition: 1s;
+
+			label {
+				width: 50%;
+			}
+
+			input {
+				-webkit-appearance: none;
+				width: 100%;
+				height: 0.6em;
+				background: #d3d3d3;
+				outline: none;
+				opacity: 0.7;
+				border-radius: 0.5em;
+				-webkit-transition: 0.2s;
+				transition: opacity 0.2s;
+
+				&:hover {
+					opacity: 1;
+				}
+
+				&::-webkit-slider-thumb {
+					-webkit-appearance: none;
+					appearance: none;
+					width: 1em;
+					height: 0.8em;
+					border-radius: 0.5em;
+					background: color(secondary);
+					cursor: pointer;
+				}
+
+				&::-moz-range-thumb {
+					width: 25px;
+					height: 25px;
+					background: #04aa6d;
+					cursor: pointer;
+				}
+			}
+		}
+	}
+
+	> div:last-of-type {
+		position: relative;
 		display: flex;
 		height: 90%;
 		max-height: 70vh;
@@ -114,7 +204,7 @@ article {
 			flex-basis: 10vw;
 			min-width: 8vw;
 			flex-grow: 1;
-			height: 100%;
+			height: inherit;
 			max-height: 70vh;
 			overflow-y: scroll;
 			border-radius: 0.4em 0 0 0.4em;
@@ -125,8 +215,6 @@ article {
 				justify-content: center;
 				gap: 1em;
 				flex-wrap: wrap;
-				flex-grow: 1;
-
 				padding: 0.5em;
 
 				$qty: 24;
@@ -209,49 +297,5 @@ article {
 		// 	width: 100%;
 		// 	background-color: #fff;
 		// }
-	}
-
-	.slider {
-		display: flex;
-		align-items: center;
-		margin-top: 1em;
-
-		label {
-			flex-basis: 10vw;
-			flex-grow: 1;
-		}
-
-		input {
-			-webkit-appearance: none;
-			width: 100%;
-			height: 1.5em;
-			background: #d3d3d3;
-			outline: none;
-			opacity: 0.7;
-			border-radius: 0.5em;
-			-webkit-transition: 0.2s;
-			transition: opacity 0.2s;
-
-			&:hover {
-				opacity: 1;
-			}
-
-			&::-webkit-slider-thumb {
-				-webkit-appearance: none;
-				appearance: none;
-				width: 2em;
-				height: 1.5em;
-				border-radius: 0.5em;
-				background: skyblue;
-				cursor: pointer;
-			}
-
-			&::-moz-range-thumb {
-				width: 25px;
-				height: 25px;
-				background: #04aa6d;
-				cursor: pointer;
-			}
-		}
 	}
 }

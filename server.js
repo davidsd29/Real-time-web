@@ -164,6 +164,7 @@ function newRound(socket, room) {
 		// };
 		socket.broadcast.emit('activePlayer', activePlayer); // Give the active player to all the sockets
 		console.log('De actieve speler is: ', activePlayer);
+		socket.broadcast.emit('startTimer', true)
 	} else {
 		console.log('Not enough players');
 	}

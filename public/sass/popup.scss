@@ -15,6 +15,7 @@
 	text-align: center;
 	transform: translate(-50%, -50%) scale(0.9);
 	transition: all 0.3s;
+	backdrop-filter: blur(1rem);
 	z-index: 10;
 
 	p {

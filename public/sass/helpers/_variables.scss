@@ -8,3 +8,22 @@ $breakpoint-sm: 576px;
 $breakpoint-md: 768px;
 $breakpoint-lg: 992px;
 $breakpoint-xl: 1200px;
+
+
+@font-face {
+	font-family: Wable;
+	src: url('../fonts/Good-Morning.ttf') format('truetype'); 
+	font-style: normal;
+}
+
+@font-face {
+	font-family: Scrabble;
+	src: url('../fonts/HelloGraduationSans-d9enl.tff') format('truetype');
+	font-style: regular;
+}
+
+@font-face {
+	font-family: Writing;
+	src: url('../fonts/ShadowsIntoLight-Regular.ttf') format('truetype');
+	font-style: regular;
+}

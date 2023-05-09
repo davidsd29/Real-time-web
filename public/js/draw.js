@@ -5,6 +5,9 @@ const brush = {
 	color: document.querySelectorAll('[data-brush-color]'),
 	slider: document.querySelector('[data-brush-slider]'),
 	value: document.querySelector('[data-brush-value]'),
+	button: document.querySelector('[data-brush-btn]'),
+	option: document.querySelector('[data-brush-option]'),
+	frame: document.querySelector('[data-brush]'),
 };
 
 const clientBtn = document.querySelector('[data-host]');
@@ -117,6 +120,10 @@ function throttle(callback, delay) {
 	};
 }
 
+brush.button.addEventListener('click', () => {
+	brush.option.classList.toggle('hidden');
+});
+
 
 brush.slider.addEventListener('input', () => {
 	brush.value.textContent = brush.slider.value;
@@ -154,6 +161,7 @@ socket.on('activePlayer', (player) => {
 		mayDraw = true;
 		// Show the drawing options and answer
 		brush.pallet.classList.remove('hidden');
+		brush.frame.classList.remove('hidden');
 		console.log('word: ' + word);
 		drawWord.textContent = `${word}`.toUpperCase();
 
@@ -197,6 +205,7 @@ socket.on('activePlayer', (player) => {
 
 		// Hide the drawing options and answer
 		if (brush.pallet.classList.contains('hidden')) return;
+		brush.frame.classList.add('hidden');
 		brush.pallet.classList.add('hidden');
 	}
 });

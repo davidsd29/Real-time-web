@@ -1,7 +1,11 @@
 header {
 	display: flex;
-	justify-content: space-between;
+	justify-content: end;
 	padding: 1em 2em;
+
+	&#game {
+		justify-content: space-between;
+	}
 
 	ul {
 		display: flex;

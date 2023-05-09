@@ -1,3 +1,59 @@
+.chat {
+	position: fixed;
+	top: 20%;
+	left: 0;
+	height: max-content;
+	z-index: 1000;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	transition: 1s;
+	transform: translateX(calc(100vw - 2em));
+
+	&:has(input:checked) {
+		transition: 1s;
+		transform: translateX(calc(100vw - 32em));
+	}
+
+	label {
+		position: relative;
+		display: block;
+		width: 2em;
+		padding: 0.6em 1em;
+		cursor: pointer;
+		background-color: lightgray;
+		border-radius: 1em 0 0 1em;
+		margin-bottom: 112%;
+
+		input {
+			visibility: hidden;
+		}
+
+		p {
+			margin-top: 5em;
+			font-size: 1em;
+			transform: rotate(-90deg);
+			text-transform: uppercase;
+			overflow-wrap: normal;
+
+			span {
+				position: absolute;
+				top: .2em;
+				left: 3em;
+				background-color: red;
+				color: white;
+				width: 1em;
+				aspect-ratio: 1;
+				display: block;
+				text-align: center;
+				transform: rotate(90deg);
+				border-radius: 50%;
+			}
+		}
+	}
+}
+
 .chat_session {
 	display: flex;
 	flex-direction: column;
@@ -9,12 +65,12 @@
 
 	background: rgba(255, 255, 255, 0.6);
 	backdrop-filter: blur(1rem);
-	border-radius: 1em;
+	border-radius: 0 1em 1em 1em;
 	border: 1px solid rgba(255, 255, 255, 0.2);
 	box-shadow: 0.8rem 0.8rem 1.6rem 0 rgba(206, 205, 205, 0.5),
 		-0.8rem -0.8rem 1.6rem 0 rgba(255, 255, 255, 0.5);
 
-	background-color: seashell;
+	background-color: lightgray;
 
 	// p {
 	// 	width: 100%;
@@ -46,7 +102,6 @@
 			margin-bottom: 0.6em;
 			padding: 0.4em;
 
-			
 			border-radius: 4px;
 			text-align: left;
 
@@ -102,9 +157,8 @@
 
 			p {
 				&:first-of-type {
-					margin-bottom: .5em;
+					margin-bottom: 0.5em;
 					border-bottom: 1px solid #ccc;
-
 				}
 
 				span {

@@ -1,9 +1,11 @@
-ul {
-	list-style: none;
+body {
+	display: grid;
+	height: 100vh;
+	background: cornflowerblue;
 }
 
-body {
-	background: cornflowerblue;
+ul {
+	list-style: none;
 }
 
 a {
