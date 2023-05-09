@@ -1,5 +1,11 @@
 <header>
-	<h1>Room Number: {{room_number}}</h1>
+	<h1>Room: {{room_number}}</h1>
+
+	<div>
+		<p>Team Blue <span data-blue-points>0</span></p>
+		<p>Team Red <span data-red-points>0</span></p>
+	</div>
+
 	<nav>
 		<ul>
 			<li><button data-host="{{ user_name }}" data-room="{{room_number}}" data-leave>Stop Game</button></li>

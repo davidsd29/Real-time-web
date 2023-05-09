@@ -5,13 +5,14 @@ function userJoin(id, username, room, team) {
 	if (team === undefined) {
 		const blueTeam = users.filter((user) => user.team === 'blue');
 		const redTeam = users.filter((user) => user.team === 'red');
+		const teams = ['blue', 'red'];
 
 		if (blueTeam.length > redTeam.length) {
 			team = 'red';
 		} else if (blueTeam.length < redTeam.length) {
 			team = 'blue';
 		} else {
-			team = team[Math.floor(Math.random() * team.length)];
+			team = teams[Math.floor(Math.random() * teams.length)];
 		}
 	}
 	const user = { id, username, room, team };
@@ -48,4 +49,8 @@ function getRoomUsers(room) {
 	return users.filter((user) => user.room === room);
 }
 
-export { userJoin, getRoomUsers, getCurrentUser, chooseActivePlayer };
+function getRoomNumbers() {
+	return users.map((user) => user.room);
+}
+
+export { userJoin, getRoomUsers, getCurrentUser, getRoomNumbers, chooseActivePlayer };

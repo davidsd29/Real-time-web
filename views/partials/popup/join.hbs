@@ -1,0 +1,20 @@
+<div class='pop-up' data-popup-join>
+	<p class='text text__big'>Join a gaming room</p>
+	<form action='/game' id='join_form'>
+
+		<input
+			type='number'
+			name='room_nmbr'
+			placeholder='Enter the room number'
+			required
+		/>
+		<input type='text' name='guest' placeholder='Enter your name' required />
+        <p class="nonvalid hidden" data-notvalid>The room does not exist, please create your own room or try again.</p>
+
+		<fieldset>
+
+			<button type='submit' class='btn'>Join</button>
+			<button class='btn btn__cancel' data-join-cancel>Cancel</button>
+		</fieldset>
+	</form>
+</div>

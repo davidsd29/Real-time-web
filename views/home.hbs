@@ -2,7 +2,7 @@
 <section class="intro">
 
 </section>
-
+{{> popup/join}}
 <article>
     <p>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. In vulputate ligula eget tristique lacinia. Sed ullamcorper sed
@@ -11,15 +11,21 @@
     </p>
 
     <form id="host_form" action="/game/{{roomNumber}}" method="POST">
-    <label for="red">Red</label>
-    <input type="radio" name="team" id="red" value="red">
-    <label for="blue">Blue</label>
-    <input type="radio" name="team" id="blue" value="blue">
+        <h2>Choose your team...</h2>
+        <fieldset>
+            <label>
+                Red
+                <input type="radio" name="team" value="red" required>
+            </label>
 
+            <label for="blue">
+                Blue
+                <input type="radio" name="team" id="blue" value="blue" required>
+            </label>
+        </fieldset>
 
-        <label for="user_name">Name</label>
         <input type="text" id="user_name" name="user_name" placeholder="Please enter your name" required autocomplete="off">
-        <button type="submit" data-room="{{roomNumber}}">Join</button>
+        <button type="submit" class="btn" data-room="{{roomNumber}}">Join</button>
     </form>
     
 </article> 

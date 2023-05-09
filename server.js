@@ -12,6 +12,7 @@ import {
 	userJoin,
 	getRoomUsers,
 	getCurrentUser,
+	getRoomNumbers,
 	chooseActivePlayer,
 } from './utils/users.js';
 import http from 'http';
@@ -89,13 +90,16 @@ io.on('connection', (socket) => {
 		});
 	});
 
-	// 	socket.on('leaveRoom', (user) => {
-	// 		if (addedUser) leaveRoom(socket, user);
-	// 	});
+	socket.on('checkRoom', (player) => {
+		const rooms = getRoomNumbers();
+		console.log(rooms);
 
-	// socket.on('drawing', (data) => socket.broadcast.emit('drawing', data));
-
-	// 	// io.emit('history', history)
+		if (rooms.includes(player.room)) {
+			socket.emit('roomExists', true, player);
+		} else {
+			socket.emit('roomExists', false, player);
+		}
+	});
 
 	socket.on('drawing', (draw) => {
 		io.emit('draw', draw);
@@ -122,7 +126,8 @@ io.on('connection', (socket) => {
 		io.emit(
 			'message',
 			formatMessage(message.user, message.text),
-			message.room, message.team
+			message.room,
+			message.team
 		);
 	});
 

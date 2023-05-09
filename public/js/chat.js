@@ -26,6 +26,29 @@ const guest = {
 	room: document.querySelector('#join_form input[type="number"]'),
 };
 
+const settings = {
+	button: document.querySelector('[data-setting-btn]'),
+	frame: document.querySelector('[data-setting]'),
+	close: document.querySelector('[data-setting-close]'),
+};
+
+const join = {
+	button: document.querySelector('[data-join]'),
+	cancel: document.querySelector('[data-join-cancel]'),
+};
+
+const points = {
+	teamRed: document.querySelector('[data-red-points]'),
+	teamBlue: document.querySelector('[data-blue-points]'),
+	redPoints: 0,
+	bluePoints: 0,
+};
+
+const popUp = {
+	join: document.querySelector('[data-popup-join]'),
+	correct: document.querySelector('[data-popup-correct]'),
+	notValid: document.querySelector('[data-notValid]'),
+};
 setTimeout(() => {
 	if (welcome_frame !== null) welcome_frame.classList.remove('visible');
 }, 3000);
@@ -42,7 +65,15 @@ const checkAwnser = (message, roomNumber) => {
 	if (message.text.toLowerCase() == drawWord.textContent.toLowerCase()) {
 		// celebrate the winner
 		console.log(`winner is ${message.username} from team ${message.team}`);
-		
+
+		if (message.team === 'red') {
+			points.redPoints += 1;
+			points.teamRed.textContent = points.redPoints;
+		} else {
+			points.bluePoints += 1;
+			points.teamBlue.textContent = points.bluePoints;
+		}
+
 		socket.emit('newRound', roomNumber);
 	}
 };
@@ -68,16 +99,8 @@ const log = (message) => {
 	bot_message.textContent = message;
 	bot_message.classList.add('log');
 
-	if(chat.messages) chat.messages.appendChild(bot_message);
+	if (chat.messages) chat.messages.appendChild(bot_message);
 };
-
-// settings.button.addEventListener('click', () => {
-// 	settings.frame.classList.add('visible');
-// });
-
-// settings.close.addEventListener('click', () => {
-// 	settings.frame.classList.remove('visible');
-// });
 
 socket.on('message', (message, roomNumber, team) => {
 	let botMessage = message.username.includes('Bot');
@@ -91,6 +114,17 @@ socket.on('message', (message, roomNumber, team) => {
 	chat.messages.scrollTop = chat.messages.scrollHeight;
 });
 
+socket.on('roomExists', (exist, player) => {
+	if (exist) {
+		socket.emit('joinRoom', player);
+		guest.form.submit();
+	} else {
+		popUp.notValid.classList.remove('hidden');
+		setTimeout(() => {
+			popUp.notValid.classList.add('hidden');
+		}, 4000);
+	}
+});
 
 if (start.form) {
 	start.submit.addEventListener('click', (event) => {
@@ -109,6 +143,7 @@ if (start.form) {
 	});
 
 	guest.form.addEventListener('submit', (event) => {
+		event.preventDefault();
 		// Whenever the server emits 'user joined', log it in the chat body
 		if (guest.name.value && guest.room.value) {
 			const player = {
@@ -116,9 +151,18 @@ if (start.form) {
 				room: guest.room.value,
 			};
 
-			socket.emit('joinRoom', player);
+			socket.emit('checkRoom', player);
+			// socket.emit('joinRoom', player);
 			socket.emit('newRound', player.room);
 		}
+	});
+
+	join.button.addEventListener('click', () => {
+		popUp.join.classList.toggle('open');
+	});
+
+	join.cancel.addEventListener('click', () => {
+		popUp.join.classList.remove('open');
 	});
 }
 
@@ -139,14 +183,18 @@ if (chat.leave) {
 			.querySelector('button')
 			.getAttribute('data-host');
 
-			host = user_name;
-		 
+		host = user_name;
+
 		if (chat.input.value) {
 			const chat_bolb = {
 				user: user_name,
 				text: chat.input.value,
-				room: event.target.querySelector('button').getAttribute('data-room-number'),
-				team: event.target.querySelector('button').getAttribute('data-team'),
+				room: event.target
+					.querySelector('button')
+					.getAttribute('data-room-number'),
+				team: event.target
+					.querySelector('button')
+					.getAttribute('data-team'),
 			};
 
 			// Tell the server your username and message
@@ -156,3 +204,11 @@ if (chat.leave) {
 		}
 	});
 }
+
+settings.button.addEventListener('click', () => {
+	settings.frame.classList.add('visible');
+});
+
+settings.close.addEventListener('click', () => {
+	settings.frame.classList.remove('visible');
+});
