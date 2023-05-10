@@ -92,9 +92,9 @@ function drawEvent(draw) {
 
 // make the canvas fill its parent when the browser is resized
 function onResize() {
-	
 	// canvas.width = window.innerWidth;
-	canvas.height = canvasParent.innerHeight;
+	// canvas.height = canvasParent.innerHeight;
+	if (canvas) canvas.height = canvasParent.clientHeight;
 }
 
 // limit the number of events per second
@@ -110,8 +110,8 @@ function throttle(callback, delay) {
 	};
 }
 
-window.addEventListener('resize', onResize);
-onResize();
+// window.addEventListener('resize', onResize);
+// onResize();
 
 brush.button.addEventListener('click', () => {
 	brush.option.classList.toggle('hidden');

@@ -11,7 +11,7 @@ const checkRoom = (roomNumber) => {
 router
 	.get('/', (req, res) => {
 		console.log('ik ben er in gekomen');
-		const room = checkRoom(req.query.room_nmbr);
+
 		// if (room.length !== 0) {
 		// room[0].players.push(req.query.guest);
 		res.render('game', {
@@ -33,6 +33,7 @@ router
 		});
 
 		console.log(chat_rooms);
+		console.log('ik post');
 
 		res.render('game', {
 			game: true,
@@ -46,7 +47,6 @@ router
 	.get('/:roomNumber', (req, res) => {
 		const room = checkRoom(req.query.room_nmbr);
 		console.log(room);
-
 		res.render('game', {
 			game: true,
 			room_number: req.params.roomNumber,

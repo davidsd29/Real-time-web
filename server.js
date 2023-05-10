@@ -75,6 +75,7 @@ io.on('connection', (socket) => {
 
 		//when player connects, send the team to the client
 		socket.emit('playerTeam', user.team);
+		console.log('player team: ' + user.team);
 
 		// broadcast globally (all clients) that a person has connected to a specific room
 		socket.broadcast.emit(
@@ -156,6 +157,8 @@ io.on('connection', (socket) => {
 });
 
 function newRound(socket, room) {
+
+	console.log('newRound in room: ', room)
 	if (getRoomUsers(room).length > 2) {
 		// socket.nickname = chooseActivePlayer(room);
 		let activePlayer = chooseActivePlayer(room); // Make a new active player randomly

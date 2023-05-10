@@ -172,7 +172,8 @@ socket
 	})
 
 	.on('playerTeam', (team) => {
-		chat.send.setAttribute('data-team', team);
+		console.log('lkkklbsbljdabe' + team);
+		if (chat.send) chat.send.setAttribute('data-team', team);
 	})
 
 	.on('roomExists', (exist, player) => {
@@ -189,6 +190,8 @@ socket
 
 if (start.form) {
 	start.submit.addEventListener('click', (event) => {
+		event.preventDefault();
+
 		// Whenever the server emits 'user joined', log it in the chat body
 		if (start.name.value) {
 			const player = {
