@@ -7,6 +7,7 @@ const welcome_frame = document.querySelector('[data-welcome]');
 const drawWord = document.querySelector('[data-draw-word]');
 
 const chat = {
+	send: document.querySelector('#chat button'),
 	section: document.querySelector('.chat_session'),
 	form: document.querySelector('#chat'),
 	messages: document.querySelector('.chat_session ul'),
@@ -68,29 +69,37 @@ const updateParticipantsAmount = (data) => {
 	}
 };
 
-const checkAwnser = (message, roomNumber) => {
+
+const checkAwnser = (message, roomNumber, team, socket) => {
 	if (message.text.toLowerCase() == drawWord.textContent.toLowerCase()) {
 		// celebrate the winner
 		console.log(`winner is ${message.username} from team ${message.team}`);
 
-		if (message.team === 'red') {
-			points.redPoints += 1;
-			points.teamRed.textContent = points.redPoints;
+		if (team === 'red') {
+			socket.emit(
+				'correctAnswer',
+				roomNumber,
+				'red',
+				(points.redPoints += 1)
+			);
 		} else {
-			points.bluePoints += 1;
-			points.teamBlue.textContent = points.bluePoints;
+			socket.emit(
+				'correctAnswer',
+				roomNumber,
+				'blue',
+				(points.bluePoints += 1)
+			);
 		}
-
-		socket.emit('newRound', roomNumber);
 	}
 };
 
-function addMessageElement(message, roomNumber, team) {
+
+function addMessageElement(message, roomNumber, team, socket) {
 	const chat_message = document.createElement('li');
-	chat_message.innerHTML = `<p>${message.username} <span>${message.time}</span> <p>
+	chat_message.innerHTML = `<p class=${team} >${message.username} <span>${message.time}</span> <p>
 		<p class='test'>${message.text}</p>`;
 
-	checkAwnser(message, roomNumber, team);
+	checkAwnser(message, roomNumber, socket);
 
 	if (message.username === host) {
 		chat_message.classList.add('host');
@@ -101,7 +110,8 @@ function addMessageElement(message, roomNumber, team) {
 	chat.messages.appendChild(chat_message);
 
 	if (chat.toggle.checked) {
-		if (!chat.indicator.classList.contains('hidden')) chat.indicator.classList.add('hidden');
+		if (!chat.indicator.classList.contains('hidden'))
+			chat.indicator.classList.add('hidden');
 		chat.indicator.textContent = 0;
 	} else {
 		chat.indicator.classList.remove('hidden');
@@ -124,10 +134,20 @@ socket
 			log(message.text);
 			return;
 		} else {
-			addMessageElement(message, roomNumber, team);
+			addMessageElement(message, roomNumber, team, socket);
 		}
 
 		chat.messages.scrollTop = chat.messages.scrollHeight;
+	})
+
+	.on('sendPoints', (room, team, points) => {
+		if (team === 'red') {
+			points.teamRed.textContent = points;
+		} else {
+			points.teamBlue.textContent = points;
+		}
+
+		socket.emit('newRound', room);
 	})
 
 	.on('startTimer', (start) => {
@@ -143,6 +163,16 @@ socket
 		} else {
 			timer.classList.remove('contdown');
 		}
+	})
+
+	.on('roomUsers', (data) => {
+		console.log('roomUsers');
+		console.log(data);
+		updateParticipantsAmount(data.users);
+	})
+
+	.on('playerTeam', (team) => {
+		chat.send.setAttribute('data-team', team);
 	})
 
 	.on('roomExists', (exist, player) => {
@@ -183,7 +213,6 @@ if (start.form) {
 			};
 
 			socket.emit('checkRoom', player);
-			// socket.emit('joinRoom', player);
 			socket.emit('newRound', player.room);
 		}
 	});

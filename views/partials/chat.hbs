@@ -1,16 +1,15 @@
 <aside class="chat">
     <label for="chat_toggle">
         <input type="checkbox" name="chat_toggle" id="chat_toggle" data-chat-toggle> 
-        <p>Chat <span data-message-indicator class="hidden"></span></p>
+        <p class="text text__bold">Chat <span data-message-indicator class="hidden"></span></p>
     </label>
 
     <section class="chat_session">
-        <p class="text__big" data-participants>0 friends online</p>
+        <p class="text text__title" data-participants>0 friends online</p>
         <ul></ul>
         <form id="chat">
             <input type="text" autocomplete="off">
-            <button class="btn" data-host="{{ user_name }}" data-room-number="{{room_number}}"
-                data-team="{{team}}">Send</button>
+            <button data-host="{{ user_name }}" data-room-number="{{room_number}}">Send</button>
         </form>
     </section>
 </aside>

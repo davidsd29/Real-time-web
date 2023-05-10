@@ -24,7 +24,7 @@
 		cursor: pointer;
 		background-color: lightgray;
 		border-radius: 1em 0 0 1em;
-		margin-bottom: 112%;
+		margin-bottom: 71%;
 
 		input {
 			visibility: hidden;
@@ -65,19 +65,16 @@
 
 	background: rgba(255, 255, 255, 0.6);
 	backdrop-filter: blur(1rem);
-	border-radius: 0 1em 1em 1em;
+	border-radius: 0 0em 1em 1em;
 	border: 1px solid rgba(255, 255, 255, 0.2);
 	box-shadow: 0.8rem 0.8rem 1.6rem 0 rgba(206, 205, 205, 0.5),
 		-0.8rem -0.8rem 1.6rem 0 rgba(255, 255, 255, 0.5);
 
 	background-color: lightgray;
 
-	// p {
-	// 	width: 100%;
-	// 	padding-bottom: 0.4em;
-	// 	margin-bottom: 1em;
-	// 	border-bottom: 1px solid #ccc;
-	// }
+	p.text {
+		font-size: 2rem;
+	}
 
 	.log {
 		color: gray;
@@ -114,13 +111,13 @@
 			}
 
 			&.host {
-				background-color: #ffe7e7;
+				background-color: #858585;
 				box-shadow: 6px 7px 10px -3px #aaa;
-				border: 1px solid #e39797;
+				border: 1px solid #3f3f3f;
 				&::after {
 					top: 0;
 					left: -0.975em;
-					border-top: 0.975em solid #ffe7e7;
+					border-top: 0.975em solid #858585;
 					border-left: 0.975em solid transparent;
 					border-right: 0.975em solid transparent;
 				}
@@ -128,20 +125,20 @@
 				&:before {
 					top: -1px;
 					left: -1.075em;
-					border-top: 17px solid #e39797;
+					border-top: 17px solid #3f3f3f;
 					border-left: 1em solid transparent;
 					border-right: 1em solid transparent;
 				}
 			}
 
 			&.guest {
-				background-color: #e7f6ff;
+				background-color: #e1e1e1;
 				box-shadow: -6px 7px 10px -3px #aaa;
-				border: 1px solid #97c6e3;
+				border: 1px solid #7c7c7c;
 				&::after {
 					bottom: 0;
 					right: -0.975em;
-					border-bottom: 0.975em solid #e7f6ff;
+					border-bottom: 0.975em solid #e1e1e1;
 					border-left: 0.975em solid transparent;
 					border-right: 0.975em solid transparent;
 				}
@@ -149,7 +146,7 @@
 				&:before {
 					bottom: -1px;
 					right: -1.075em;
-					border-bottom: 1em solid #97c6e3;
+					border-bottom: 1em solid #7c7c7c;
 					border-left: 1em solid transparent;
 					border-right: 1em solid transparent;
 				}
@@ -159,6 +156,14 @@
 				&:first-of-type {
 					margin-bottom: 0.5em;
 					border-bottom: 1px solid #ccc;
+				}
+
+				&.red {
+					color: red;
+				}
+
+				&.blue {
+					color: blue;
 				}
 
 				span {

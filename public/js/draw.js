@@ -9,7 +9,7 @@ const brush = {
 	option: document.querySelector('[data-brush-option]'),
 	frame: document.querySelector('[data-brush]'),
 };
-
+const canvasParent = document.querySelector('.drawspace last-child');
 const clientBtn = document.querySelector('[data-host]');
 const canvas = document.querySelector('canvas');
 
@@ -34,10 +34,9 @@ const mouseCanvasLocation = (e, axis) => {
 	} else return Math.floor(e.clientY - rect.top);
 };
 
-
 // if user starts drawing
 socket.on('startDrawing', (coordinates) => {
-	console.log('start drawing')
+	console.log('start drawing');
 	isDrawing = true;
 	mouseVector = { x: coordinates[0], y: coordinates[1] };
 });
@@ -77,8 +76,7 @@ function drawLine(coordinates, currentColor, brushSize) {
 
 		socket.on('drawing', drawEvent);
 	}
-};
-
+}
 
 function drawEvent(draw) {
 	const { x, y, color, stroke } = draw;
@@ -92,20 +90,12 @@ function drawEvent(draw) {
 	canvasContex.closePath();
 }
 
-// function getMousePos(e) {
-// 	isDrawing = true;
-// 	var rect = canvas.getBoundingClientRect();
-
-// 	console.log(rect);
-// 	// Store the mouse cordinates
-// 	// mouseVector.x = mouseCanvasLocation(e, 'x');
-// 	// mouseVector.y = mouseCanvasLocation(e, 'y');
-// 	mouseVector.x = e.clientX;
-// 	mouseVector.y = e.clientY;
-
-// 	console.log('mouse start: x: ' + mouseVector.x, ' y: ' + mouseVector.y);
-// }
-
+// make the canvas fill its parent when the browser is resized
+function onResize() {
+	
+	// canvas.width = window.innerWidth;
+	canvas.height = canvasParent.innerHeight;
+}
 
 // limit the number of events per second
 function throttle(callback, delay) {
@@ -120,10 +110,12 @@ function throttle(callback, delay) {
 	};
 }
 
+window.addEventListener('resize', onResize);
+onResize();
+
 brush.button.addEventListener('click', () => {
 	brush.option.classList.toggle('hidden');
 });
-
 
 brush.slider.addEventListener('input', () => {
 	brush.value.textContent = brush.slider.value;
@@ -172,20 +164,27 @@ socket.on('activePlayer', (player) => {
 			);
 
 			// socket.emit('startDrawing', [event.offsetX, event.offsetY]);
-			socket.emit('startDrawing', [mouseCanvasLocation(event, 'x'), mouseCanvasLocation(event, 'y')]);
+			socket.emit('startDrawing', [
+				mouseCanvasLocation(event, 'x'),
+				mouseCanvasLocation(event, 'y'),
+			]);
 		};
 
 		stopDrawing = (event) => {
 			// socket.emit('stopDrawing', [event.offsetX, event.offsetY]);
-			socket.emit('stopDrawing', [mouseCanvasLocation(event, 'x'), mouseCanvasLocation(event, 'y')]);
-
+			socket.emit('stopDrawing', [
+				mouseCanvasLocation(event, 'x'),
+				mouseCanvasLocation(event, 'y'),
+			]);
 		};
 
 		onMouseMove = (event) => {
-			if(!isDrawing) return;
+			if (!isDrawing) return;
 			// socket.emit('move', [event.offsetX, event.offsetY]);
-			socket.emit('move', [mouseCanvasLocation(event, 'x'), mouseCanvasLocation(event, 'y')]);
-			
+			socket.emit('move', [
+				mouseCanvasLocation(event, 'x'),
+				mouseCanvasLocation(event, 'y'),
+			]);
 		};
 
 		// Add the option to draw

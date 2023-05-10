@@ -4,42 +4,124 @@ header {
 	padding: 1em 2em;
 
 	&#game {
+		width: 100%;
 		justify-content: space-between;
+		padding-bottom: 0;
+
+		div {
+			position: absolute;
+			left: 50%;
+			top: 5%;
+			transform: translate(-50%, 10px);
+		}
 	}
 
-	ul {
-		display: flex;
-		align-items: center;
-		gap: 1em;
+	nav {
+		&.mobile {
+			display: none;
+			
+			@include respond-to(up-to-md) {
+				display: block;
+			}
 
-		li {
-			display: block;
-			padding: 1em;
-			border-radius: 0.5em;
-			cursor: pointer;
+			ul {
+				position: relative;
+				display: none;
+				flex-direction: column;
+				list-style: none;
+				padding: 0 3em 0;
+				margin-top: 4em;
 
-			&:hover {
-				border-bottom: 2px solid color(secondary);
+				// @include respond-to(from-md) {
+				// 	display: flex;
+				// }
 
-				i {
-					animation: spin 2s infinite linear;
+				li {
+					display: block;
+					padding: 1em;
+					cursor: pointer;
 				}
 			}
 
-			button {
-                display: flex;
-                align-items: center;
-                gap: .8em;
-				background: none;
-				border: none;
-				cursor: inherit;
+			.menu-toggle-container {
+				display: none;
+				height: 3em;
+				width: 3em;
+				cursor: pointer;
+				transform: rotate(0deg);
+				transition: all 0.3s variable(cubic);
+				user-select: none;
 
-				i {
-					font-size: 2em !important;
+				@include respond-to(up-to-md) {
+					display: inline-block;
 				}
 
-				span {
-					margin-top: 0.4em;
+				#menu-toggle {
+					position: relative;
+					top: 50%;
+					display: block;
+					width: 2em;
+					aspect-ratio: 1/1;
+					cursor: pointer;
+					background: none;
+					border: none;
+					margin: 0 auto;
+
+					span {
+						display: block;
+						width: 100%;
+						height: 2px;
+						background: color(secondary);
+						transition: all 0.5s cubic-bezier(0.4, 0.01, 0.165, 0.99);
+						transition-delay: 0s;
+
+						&:first-of-type {
+							transform: translateY(0px) rotate(0deg);
+						}
+
+						&:last-of-type {
+							transform: translateY(6px) rotate(0deg);
+						}
+					}
+				}
+			}
+		}
+
+		&.desktop {
+			@include respond-to(up-to-md) {
+				display: none;
+			}
+
+			ul {
+				display: flex;
+				align-items: center;
+				gap: 1em;
+			}
+
+			li {
+				display: block;
+				padding: 1em;
+				cursor: pointer;
+
+				&:hover {
+					i {
+						animation: spin 2s infinite linear;
+					}
+				}
+
+				button {
+					display: flex;
+					align-items: center;
+					color: color(secondary) !important;
+
+					i {
+						font-size: 1.5em !important;
+						margin-right: 0.5em;
+					}
+
+					span {
+						margin-top: 0.4em;
+					}
 				}
 			}
 		}

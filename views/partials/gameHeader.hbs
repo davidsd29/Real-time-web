@@ -1,21 +1,51 @@
-<header id="game">
+<header id='game'>
 	{{!-- <h1 class="titile title__small">ROOM: {{room_number}}</h1> --}}
-	<h1 class="text text__titile">ROOM: {{room_number}}</h1>
+	<h1 class='text text__titile'>ROOM: {{room_number}}</h1>
 
 	<div>
-		<p class="title title__small">TEAM RED <span data-blue-points>0</span></p>
-		<p class="title title__small">TEAM BLUE <span data-red-points>0</span></p>
+		<p class='title title__small'>TEAM RED <span data-blue-points>0</span></p>
+		<p class='title title__small'>TEAM BLUE <span data-red-points>0</span></p>
 	</div>
 
-	<nav>
+	<nav class='desktop'>
 		<ul>
-			<li><button class="text text__bold" data-host="{{ user_name }}" data-room="{{room_number}}" data-leave>Stop Game</button></li>
+			<li><button
+					class='text text__bold btn'
+					data-host='{{user_name}}'
+					data-room='{{room_number}}'
+					data-leave
+				>Stop Game</button></li>
 			<li>
-				<button class="text text__bold" data-setting-btn>
+				<button class='text text__bold btn' data-setting-btn>
 					<i class='fa fa-gear'></i>
 					<span>Settings</span>
 				</button>
 			</li>
 		</ul>
 	</nav>
+
+	<nav class='mobile'>
+
+		<aside class='menu-toggle-container'>
+			<button id='menu-toggle'>
+				<span></span>
+				<span></span>
+			</button>
+		</aside>
+
+		<ul>
+			<li>
+				<button data-join>
+					Join Room
+				</button>
+			</li>
+			<li>
+				<button data-setting-btn>
+					<i class='fa fa-gear'></i>
+					<span>Settings</span>
+				</button>
+			</li>
+		</ul>
+	</nav>
+
 </header>

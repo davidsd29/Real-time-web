@@ -36,6 +36,7 @@ router
 
 		res.render('game', {
 			game: true,
+			team: req.body.team,
 			room_number: req.params.roomNumber,
 			subject: word,
 			user_name: req.body.user_name || {},

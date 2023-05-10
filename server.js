@@ -36,7 +36,6 @@ import game from './routes/game.js';
 
 // HBS Setup
 import { engine } from 'express-handlebars';
-import { Console } from 'console';
 
 app.engine(
 	'hbs',
@@ -74,7 +73,8 @@ io.on('connection', (socket) => {
 			formatMessage(botName, 'Welcome to Scribble Tittle Tattle!')
 		);
 
-		numUsers++;
+		//when player connects, send the team to the client
+		socket.emit('playerTeam', user.team);
 
 		// broadcast globally (all clients) that a person has connected to a specific room
 		socket.broadcast.emit(
@@ -83,22 +83,27 @@ io.on('connection', (socket) => {
 		);
 
 		// Send users and room info
-		io.to(user.room).emit('roomUsers', {
+		socket.to(user.room).emit('roomUsers', {
 			room: user.room,
 			users: getRoomUsers(user.room),
-			participants_amount: numUsers,
 		});
 	});
 
 	socket.on('checkRoom', (player) => {
 		const rooms = getRoomNumbers();
-		console.log(rooms);
 
 		if (rooms.includes(player.room)) {
 			socket.emit('roomExists', true, player);
 		} else {
 			socket.emit('roomExists', false, player);
 		}
+	});
+
+	socket.on('correctAnswer', (room, team, points) => {
+
+		io.emit('sendPoints', team, points);
+		// io.to(room).emit('sendPoints',room, team, points);
+		io.emit('startTimer', false);
 	});
 
 	socket.on('drawing', (draw) => {
@@ -122,6 +127,7 @@ io.on('connection', (socket) => {
 		//   history.shift()
 		// }
 		// history.push(message)
+		console.log('dit is room' + message.room)
 
 		io.emit(
 			'message',
@@ -138,7 +144,6 @@ io.on('connection', (socket) => {
 	// Runs when client disconnects
 	socket.on('leaving', (leaving) => {
 		const user = getCurrentUser(socket.id, leaving);
-		console.log(user);
 		if (user.length > 0) {
 			console.log('user disconnected ' + socket.id);
 			socket.broadcast.emit(

@@ -117,9 +117,11 @@ article {
 		display: flex;
 		justify-content: space-between;
 		border-radius: 0.5em;
-		padding: 0.5em 1em;
-		margin-bottom: 1em;
-		background-color: color(quaternary);
+		padding: 0.2em 1em;
+		padding-top: 0;
+		letter-spacing: 2px;
+		// background-color: color(quaternary);
+		// border: 2px solid color(secondary);
 
 		p {
 			font-weight: 700;
@@ -208,7 +210,9 @@ article {
 			max-height: 70vh;
 			overflow-y: scroll;
 			border-radius: 0.4em 0 0 0.4em;
-			background-color: lightgray;
+			border: 2px solid color(secondary);
+			border-right: none;
+			background-color: rgba(211, 211, 211, 0.589);
 
 			ul {
 				display: flex;
@@ -276,26 +280,13 @@ article {
 		}
 
 		.whiteboard {
-			// height: 100%;
-			// 	width: 100%;
-			// 	position: absolute;
-			// 	left: 0;
-			// 	right: 0;
-			// 	bottom: 0;
-			// 	top: 0;
-			// 	background-color: red;
 			flex-grow: 3;
 			height: initial;
 			width: 100%;
 			border-radius: 0 0.4em 0.4em 0;
 			background-color: color(quaternary);
+			border: 2px solid color(secondary);
+			border-left: none;
 		}
-
-		// div {
-		// 	flex-grow: 3;
-		// 	height: 100%;
-		// 	width: 100%;
-		// 	background-color: #fff;
-		// }
 	}
 }
