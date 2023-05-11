@@ -2,6 +2,7 @@ import { startTimer } from './timer.js';
 
 let socket = io();
 let host = '';
+let time = 30;
 
 const welcome_frame = document.querySelector('[data-welcome]');
 const drawWord = document.querySelector('[data-draw-word]');
@@ -69,7 +70,6 @@ const updateParticipantsAmount = (data) => {
 	}
 };
 
-
 const checkAwnser = (message, roomNumber, team, socket) => {
 	if (message.text.toLowerCase() == drawWord.textContent.toLowerCase()) {
 		// celebrate the winner
@@ -93,7 +93,6 @@ const checkAwnser = (message, roomNumber, team, socket) => {
 	}
 };
 
-
 function addMessageElement(message, roomNumber, team, socket) {
 	const chat_message = document.createElement('li');
 	chat_message.innerHTML = `<p class=${team} >${message.username} <span>${message.time}</span> <p>
@@ -116,6 +115,20 @@ function addMessageElement(message, roomNumber, team, socket) {
 	} else {
 		chat.indicator.classList.remove('hidden');
 		chat.indicator.textContent = Number(chat.indicator.textContent) + 1;
+	}
+}
+
+function updateTimer(time, id, socket) {
+	console.log('updateTimer');
+	console.log(time);
+	if (time <= 0) {
+		clearInterval(id);
+	}
+	timer.textContent = time;
+	if (time < 10) {
+		timer.classList.add('contdown');
+	} else {
+		timer.classList.remove('contdown');
 	}
 }
 
@@ -152,16 +165,13 @@ socket
 
 	.on('startTimer', (start) => {
 		if (start) {
-			startTimer(30, socket);
-		}
-	})
+			// startTimer(30, socket);
 
-	.on('timer', (time) => {
-		timer.textContent = time;
-		if (time < 10) {
-			timer.classList.add('contdown');
-		} else {
-			timer.classList.remove('contdown');
+			let id = setInterval(() => {
+				//Update view every 1s
+				time -= 1;
+				updateTimer(time, id, socket);
+			}, 1000);
 		}
 	})
 
@@ -178,7 +188,7 @@ socket
 
 	.on('roomExists', (exist, player) => {
 		if (exist) {
-			socket.emit('joinRoom', player);
+			socket.emit('joinRoom', player, 'guest');
 			guest.form.submit();
 		} else {
 			popUp.notValid.classList.remove('hidden');
@@ -189,20 +199,23 @@ socket
 	});
 
 if (start.form) {
-	start.submit.addEventListener('click', (event) => {
-		event.preventDefault();
-
+	start.form.addEventListener('submit', (event) => {
+		// event.preventDefault();
+		console.log(event);
 		// Whenever the server emits 'user joined', log it in the chat body
 		if (start.name.value) {
+			let number = event.target
+				.querySelector('button')
+				.getAttribute('data-room');
 			const player = {
 				name: start.name.value,
 				team: start.team.value,
-				room: event.target.getAttribute('data-room'),
+				room: number,
 			};
 
 			console.log('joinRoom', player);
-			socket.emit('joinRoom', player);
-			socket.emit('newRound', player.room);
+			// socket.emit('newRound', player.room);
+			socket.emit('joinRoom', player, 'host');
 		}
 	});
 
@@ -215,7 +228,7 @@ if (start.form) {
 				room: guest.room.value,
 			};
 
-			socket.emit('checkRoom', player);
+			socket.emit('checkRoom', player, 'guest');
 			socket.emit('newRound', player.room);
 		}
 	});

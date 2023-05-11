@@ -55,17 +55,31 @@ app.use(express.static('public'));
 app.use('/', routes);
 app.use('/game', game);
 
-let numUsers = 0;
 const botName = 'Scribble Bot';
+
 // io.on sets connection event listener on
 io.on('connection', (socket) => {
 	console.log('a user connected');
 
-	socket.on('joinRoom', (player) => {
+	socket.on('joinRoom', (player, type) => {
 		console.log('player join', player);
+
+		const rooms = getRoomNumbers();
+		if (type === 'host') {
+			if (rooms.includes(player.room)) {
+				console.log('room already exists, new room number generated');
+				player.room = (Math.floor(Math.random() * 10000) + 10000)
+					.toString()
+					.substring(1);
+			}
+		}
+
 		const user = userJoin(socket.id, player.name, player.room, player.team);
 
 		socket.join(user.room);
+		//when player connects, send the team to the client
+		socket.emit('playerTeam', user.team);
+		console.log('player team: ' + user.team);
 
 		// Welcome current user
 		socket.emit(
@@ -73,21 +87,24 @@ io.on('connection', (socket) => {
 			formatMessage(botName, 'Welcome to Scribble Tittle Tattle!')
 		);
 
-		//when player connects, send the team to the client
-		socket.emit('playerTeam', user.team);
-		console.log('player team: ' + user.team);
-
 		// broadcast globally (all clients) that a person has connected to a specific room
-		socket.broadcast.emit(
+		socket.to(user.room).emit(
 			'message',
 			formatMessage(botName, `${user.username} has joined the chat`)
-		);
+		);	
+		
+		console.log('room ' + user.room)
+		// io.to(user.room).emit(
+		// 	'message',
+		// 	formatMessage(botName, `${user.username} has joined the chat`)
+		// );
+		socket.emit('newRound', player.room);
 
 		// Send users and room info
-		socket.to(user.room).emit('roomUsers', {
-			room: user.room,
-			users: getRoomUsers(user.room),
-		});
+		// io.to(user.room).emit('roomUsers', {
+		// 	room: user.room,
+		// 	users: getRoomUsers(user.room),
+		// });
 	});
 
 	socket.on('checkRoom', (player) => {
@@ -96,13 +113,13 @@ io.on('connection', (socket) => {
 		if (rooms.includes(player.room)) {
 			socket.emit('roomExists', true, player);
 		} else {
+			console.log('room does not exist');
 			socket.emit('roomExists', false, player);
 		}
 	});
 
 	socket.on('correctAnswer', (room, team, points) => {
-
-		io.emit('sendPoints', team, points);
+		socket.broadcast.emit('sendPoints', team, points);
 		// io.to(room).emit('sendPoints',room, team, points);
 		io.emit('startTimer', false);
 	});
@@ -128,7 +145,7 @@ io.on('connection', (socket) => {
 		//   history.shift()
 		// }
 		// history.push(message)
-		console.log('dit is room' + message.room)
+		console.log('dit is room' + message.room);
 
 		io.emit(
 			'message',
@@ -136,6 +153,13 @@ io.on('connection', (socket) => {
 			message.room,
 			message.team
 		);
+		
+		// io.in(message.room).emit(
+		// 	'message',
+		// 	formatMessage(message.user, message.text),
+		// 	message.room,
+		// 	message.team
+		// );
 	});
 
 	socket.on('newRound', (roomNumber) => {
@@ -157,9 +181,8 @@ io.on('connection', (socket) => {
 });
 
 function newRound(socket, room) {
-
-	console.log('newRound in room: ', room)
-	if (getRoomUsers(room).length > 2) {
+	console.log('newRound in room: ', room);
+	if (getRoomUsers(room).length > 1) {
 		// socket.nickname = chooseActivePlayer(room);
 		let activePlayer = chooseActivePlayer(room); // Make a new active player randomly
 		const randomWord = pickRandomWord();
@@ -171,8 +194,8 @@ function newRound(socket, room) {
 		// 	random: activePlayer,
 		// };
 		socket.broadcast.emit('activePlayer', activePlayer); // Give the active player to all the sockets
+		socket.broadcast.emit('startTimer', true);
 		console.log('De actieve speler is: ', activePlayer);
-		socket.broadcast.emit('startTimer', true)
 	} else {
 		console.log('Not enough players');
 	}

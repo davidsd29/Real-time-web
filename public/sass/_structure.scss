@@ -208,6 +208,7 @@ article {
 			flex-grow: 1;
 			height: inherit;
 			max-height: 70vh;
+			max-width: 8em;
 			overflow-y: scroll;
 			border-radius: 0.4em 0 0 0.4em;
 			border: 2px solid color(secondary);
@@ -281,8 +282,8 @@ article {
 
 		.whiteboard {
 			flex-grow: 3;
-			height: initial;
-			width: 100%;
+			// height: initial;
+			// width: 100%;
 			border-radius: 0 0.4em 0.4em 0;
 			background-color: color(quaternary);
 			border: 2px solid color(secondary);

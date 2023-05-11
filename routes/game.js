@@ -9,7 +9,7 @@ const checkRoom = (roomNumber) => {
 };
 
 router
-	.get('/', (req, res) => {
+	.get('/guest', (req, res) => {
 		console.log('ik ben er in gekomen');
 
 		// if (room.length !== 0) {
@@ -23,12 +23,12 @@ router
 		// }
 	})
 
-	.post('/:roomNumber', (req, res) => {
+	.get('/:roomNumber', (req, res) => {
 		const word = pickRandomWord();
 		chat_rooms.push({
 			room_number: req.params.roomNumber,
-			host: req.body.user_name,
-			team: req.body.team,
+			host: req.query.user_name,
+			team: req.query.team,
 			players: [],
 		});
 
@@ -44,14 +44,14 @@ router
 		});
 	})
 
-	.get('/:roomNumber', (req, res) => {
-		const room = checkRoom(req.query.room_nmbr);
-		console.log(room);
-		res.render('game', {
-			game: true,
-			room_number: req.params.roomNumber,
-			user_name: req.params.guest || {},
-		});
-	});
+	// .get('/:roomNumber', (req, res) => {
+	// 	const room = checkRoom(req.query.room_nmbr);
+	// 	console.log(room);
+	// 	res.render('game', {
+	// 		game: true,
+	// 		room_number: req.params.roomNumber,
+	// 		user_name: req.params.guest || {},
+	// 	});
+	// });
 
 export default router;
