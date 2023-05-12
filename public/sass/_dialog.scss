@@ -9,8 +9,11 @@ dialog {
 
 	transform: translateY(-100%);
 	transition: all 300ms ease-in-out;
-	background-color: seashell;
 	z-index: 1;
+
+	&.welcome {
+		background:  #ccc;
+	}
 
 	&.visible {
 		transform: translateY(0);
@@ -19,6 +22,16 @@ dialog {
 	> p {
 		position: absolute;
 		top: 65%;
+	}
+
+	img {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 9em;
+		aspect-ratio: 1;
+		transform: translate(-50%, -50%);
+		z-index: 1;
 	}
 
 	.loader {
@@ -39,7 +52,7 @@ dialog {
 			width: 100%;
 			height: 100%;
 			border-radius: 50%;
-			background: linear-gradient(dodgerblue, white 60%);
+			background: linear-gradient(color(secondary), white 60%);
 			animation: spin 1.5s infinite linear;
 		}
 
@@ -71,6 +84,17 @@ dialog {
 
 	&.settings {
 		h3 {
+			margin-bottom: 1em;
+		}
+
+		fieldset {
+			border: none;
+		}
+
+		p {
+			color: #ccc;
+			font-size: 0.5em;
+			font-style: italic;
 			margin-bottom: 1em;
 		}
 

@@ -19,7 +19,7 @@ const drawWord = document.querySelector('[data-draw-word]');
 let currntColor = 'black';
 let isDrawing = false;
 let mayDraw = false;
-let word = '';
+// let word = '';
 let lineWidth = 2;
 let mouseVector = { x: 0, y: 0 };
 
@@ -90,13 +90,6 @@ function drawEvent(draw) {
 	canvasContex.closePath();
 }
 
-// make the canvas fill its parent when the browser is resized
-function onResize() {
-	// canvas.width = window.innerWidth;
-	// canvas.height = canvasParent.innerHeight;
-	if (canvas) canvas.height = canvasParent.clientHeight;
-}
-
 // limit the number of events per second
 function throttle(callback, delay) {
 	var previousCall = new Date().getTime();
@@ -109,9 +102,6 @@ function throttle(callback, delay) {
 		}
 	};
 }
-
-// window.addEventListener('resize', onResize);
-// onResize();
 
 brush.button.addEventListener('click', () => {
 	brush.option.classList.toggle('hidden');
@@ -134,11 +124,12 @@ brush.color.forEach((pallet) => {
 	});
 });
 
-socket.on('drawWord', (answer) => {
-	word = answer;
-});
+// socket.on('drawWord', (answer) => {
+// 	word = answer;
+// });
 
-socket.on('activePlayer', (player) => {
+// export function assignControls(player, randomWord, socket) {
+socket.on('startGame', (player, randomWord) => {
 	canvasContex.clearRect(0, 0, canvas.width, canvas.height);
 
 	// let clients = io.sockets.adapter.rooms[player.room];
@@ -154,8 +145,8 @@ socket.on('activePlayer', (player) => {
 		// Show the drawing options and answer
 		brush.pallet.classList.remove('hidden');
 		brush.frame.classList.remove('hidden');
-		console.log('word: ' + word);
-		drawWord.textContent = `${word}`.toUpperCase();
+		console.log('word: ' + randomWord);
+		drawWord.textContent = `${randomWord}`.toUpperCase();
 
 		startDrawing = (event) => {
 			console.log(
@@ -208,3 +199,4 @@ socket.on('activePlayer', (player) => {
 		brush.pallet.classList.add('hidden');
 	}
 });
+// }

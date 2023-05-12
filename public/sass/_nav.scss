@@ -3,23 +3,42 @@ header {
 	justify-content: end;
 	padding: 1em 2em;
 
+	.scores,
+	> button ,
+	.placeholder{
+		position: absolute;
+		left: 50%;
+		top: 5%;
+		transform: translate(-50%, 10px);
+	}
+
+	> button {
+		width: 17em;
+		padding: 2em;
+		border: none;
+
+		background: url('../img/frame.png');
+		background-position: center;
+		background-repeat: no-repeat;
+		background-size: contain;
+		cursor: pointer;
+		transition: 0.3s;
+
+		&:hover {
+			transform: translateX(-50%) scale(1.2);
+		}
+	}
+
 	&#game {
 		width: 100%;
 		justify-content: space-between;
 		padding-bottom: 0;
-
-		div {
-			position: absolute;
-			left: 50%;
-			top: 5%;
-			transform: translate(-50%, 10px);
-		}
 	}
 
 	nav {
 		&.mobile {
 			display: none;
-			
+
 			@include respond-to(up-to-md) {
 				display: block;
 			}

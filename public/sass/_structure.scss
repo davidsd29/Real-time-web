@@ -72,6 +72,9 @@ main {
 
 		img {
 			filter: invert(1);
+			width: 25vw;
+
+			max-width: 33em;
 		}
 	}
 }

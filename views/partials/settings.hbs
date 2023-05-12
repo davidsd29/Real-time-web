@@ -1,19 +1,33 @@
-<dialog class='settings' data-setting>
-    <h3 class=" title title__big">SETTINGS</h3>
+<dialog class='settings' data-settings>
+	<h3 class='title title__big'>SETTINGS</h3>
 
-    <button data-setting-close>
-        <span></span>
-        <span></span>
-    </button>
+	<button data-settings-close>
+		<span></span>
+		<span></span>
+	</button>
 
-	<div class="text text__big">
-		<label for='darkmode'>Darkmode</label>
-		<input type='checkbox' name='darkmode' id='darkmode' />
-	</div>
+	<form data-settings-form>
+		<fieldset class='text text__big'>
+			<label for='darkmode'>Darkmode</label>
+			<input type='checkbox' name='darkmode' id='darkmode' />
+		</fieldset>
 
-	<div class="text text__big">
-		<label for='sound'>Music</label>
-		<input type='checkbox' name='sound' id='sound' />
+		<fieldset class='text text__big'>
+			<label for='sound'>Music</label>
+			<input type='checkbox' name='sound' id='sound' />
+		</fieldset>
+
+		<fieldset class='text text__big'>
+			<label for='timer'>Timer Seconds:</label>
+			<input type='number' name='timer' id='timer' min='10' value="30" max='60' />
+			<p>*The timer seconds can go up to maximun of 60 seconds</p>
+		</fieldset>
+
+		<input type="submit" class="btn" value="Apply" />
+	</form>
+
+	<div class='text text__big'>
+
 	</div>
 
 </dialog>

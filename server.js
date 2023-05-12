@@ -36,6 +36,7 @@ import game from './routes/game.js';
 
 // HBS Setup
 import { engine } from 'express-handlebars';
+import { Console } from 'console';
 
 app.engine(
 	'hbs',
@@ -56,6 +57,7 @@ app.use('/', routes);
 app.use('/game', game);
 
 const botName = 'Scribble Bot';
+let settingsSeconds = 0;
 
 // io.on sets connection event listener on
 io.on('connection', (socket) => {
@@ -77,9 +79,6 @@ io.on('connection', (socket) => {
 		const user = userJoin(socket.id, player.name, player.room, player.team);
 
 		socket.join(user.room);
-		//when player connects, send the team to the client
-		socket.emit('playerTeam', user.team);
-		console.log('player team: ' + user.team);
 
 		// Welcome current user
 		socket.emit(
@@ -88,17 +87,18 @@ io.on('connection', (socket) => {
 		);
 
 		// broadcast globally (all clients) that a person has connected to a specific room
-		socket.to(user.room).emit(
-			'message',
-			formatMessage(botName, `${user.username} has joined the chat`)
-		);	
-		
-		console.log('room ' + user.room)
+		socket
+			.to(user.room)
+			.emit(
+				'message',
+				formatMessage(botName, `${user.username} has joined the chat`)
+			);
+
+		console.log('room ' + user.room);
 		// io.to(user.room).emit(
 		// 	'message',
 		// 	formatMessage(botName, `${user.username} has joined the chat`)
 		// );
-		socket.emit('newRound', player.room);
 
 		// Send users and room info
 		// io.to(user.room).emit('roomUsers', {
@@ -121,23 +121,22 @@ io.on('connection', (socket) => {
 	socket.on('correctAnswer', (room, team, points) => {
 		socket.broadcast.emit('sendPoints', team, points);
 		// io.to(room).emit('sendPoints',room, team, points);
-		io.emit('startTimer', false);
 	});
 
-	socket.on('drawing', (draw) => {
-		io.emit('draw', draw);
+	socket.on('drawing', (drawLine) => {
+		io.emit('draw', drawLine);
 	});
 
-	socket.on('startDrawing', (coord) => {
-		io.emit('startDrawing', coord);
+	socket.on('startDrawing', (coordinations) => {
+		io.emit('startDrawing', coordinations);
 	});
 
-	socket.on('stopDrawing', (coord) => {
-		io.emit('stopDrawing', coord);
+	socket.on('stopDrawing', (coordinations) => {
+		io.emit('stopDrawing', coordinations);
 	});
 
-	socket.on('move', (coord) => {
-		io.emit('move', coord);
+	socket.on('move', (coordinations) => {
+		io.emit('move', coordinations);
 	});
 
 	socket.on('chatMessage', (message) => {
@@ -153,13 +152,26 @@ io.on('connection', (socket) => {
 			message.room,
 			message.team
 		);
-		
+
 		// io.in(message.room).emit(
 		// 	'message',
 		// 	formatMessage(message.user, message.text),
 		// 	message.room,
 		// 	message.team
 		// );
+	});
+
+	socket.on('startGame', (room) => {
+		newRound(socket, room);
+	});
+
+	socket.on('startTimer', (room, started) => {
+		// io.in(room).emit('startTimer', true);
+		io.emit('startTimer', started);
+	});
+
+	socket.on('changeTimer', (time) => {
+		settingsSeconds = time;
 	});
 
 	socket.on('newRound', (roomNumber) => {
@@ -181,21 +193,14 @@ io.on('connection', (socket) => {
 });
 
 function newRound(socket, room) {
-	console.log('newRound in room: ', room);
 	if (getRoomUsers(room).length > 1) {
-		// socket.nickname = chooseActivePlayer(room);
 		let activePlayer = chooseActivePlayer(room); // Make a new active player randomly
 		const randomWord = pickRandomWord();
-
-		io.emit('drawWord', randomWord); // Give the word to all the sockets
-
-		// const players = {
-		// 	active: socket.nickname,
-		// 	random: activePlayer,
-		// };
-		socket.broadcast.emit('activePlayer', activePlayer); // Give the active player to all the sockets
-		socket.broadcast.emit('startTimer', true);
+		console.log(settingsSeconds);
+		socket.broadcast.emit('startTimer', room, settingsSeconds, true);
+		socket.to(room).emit('startTimer', room, settingsSeconds, true);
 		console.log('De actieve speler is: ', activePlayer);
+		io.emit('startGame', activePlayer, randomWord);
 	} else {
 		console.log('Not enough players');
 	}

@@ -1,10 +1,14 @@
 body {
 	display: grid;
 	height: 100vh;
-	background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+	// background: linear-gradient(-45deg, #31eeff, #001ef1, #ff8e01, #08fdd8);
 	background-size: 400% 400%;
-	animation: gradient 15s ease infinite;
+	// animation: gradient 15s ease infinite;
 	height: 100vh;
+	background-image: url('/img/frame.png');
+	background-size: cover;
+		background-blend-mode: soft-light;
+	background-color: #c7c7c7;
 }
 
 @keyframes gradient {

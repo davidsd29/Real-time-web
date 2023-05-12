@@ -1,8 +1,9 @@
-import { startTimer } from './timer.js';
+// import { assignControls } from './draw.js';
 
 let socket = io();
-let host = '';
+let hostName = '';
 let time = 30;
+let currentSeconds = 0;
 
 const welcome_frame = document.querySelector('[data-welcome]');
 const drawWord = document.querySelector('[data-draw-word]');
@@ -19,7 +20,7 @@ const chat = {
 	indicator: document.querySelector('[data-message-indicator]'),
 };
 
-const start = {
+const host = {
 	form: document.querySelector('#host_form'),
 	name: document.querySelector('#host_form input[type="text"]'),
 	team: document.querySelector('#host_form input[type="radio"]'),
@@ -33,9 +34,10 @@ const guest = {
 };
 
 const settings = {
-	button: document.querySelector('[data-setting-btn]'),
-	frame: document.querySelector('[data-setting]'),
-	close: document.querySelector('[data-setting-close]'),
+	form: document.querySelector('[data-settings-form]'),
+	button: document.querySelector('[data-settings-btn]'),
+	frame: document.querySelector('[data-settings]'),
+	close: document.querySelector('[data-settings-close]'),
 };
 
 const join = {
@@ -53,10 +55,13 @@ const points = {
 const popUp = {
 	join: document.querySelector('[data-popup-join]'),
 	correct: document.querySelector('[data-popup-correct]'),
+	timeUp: document.querySelector('[data-popup-timeUp]'),
 	notValid: document.querySelector('[data-notValid]'),
 };
 
 const timer = document.querySelector('[data-timer]');
+const startBtn = document.querySelector('[data-start-game]');
+const startPlaceholder = document.querySelector('[data-start-placeholder]');
 
 setTimeout(() => {
 	if (welcome_frame !== null) welcome_frame.classList.remove('visible');
@@ -73,7 +78,15 @@ const updateParticipantsAmount = (data) => {
 const checkAwnser = (message, roomNumber, team, socket) => {
 	if (message.text.toLowerCase() == drawWord.textContent.toLowerCase()) {
 		// celebrate the winner
-		console.log(`winner is ${message.username} from team ${message.team}`);
+		console.log(`winner is ${message.username} from team ${team}`);
+		popUp.correct.querySelector('span:first-of-type').textContent =
+			message.username;
+		popUp.correct.querySelector('span:last-of-type').textContent = team;
+		popUp.correct.classList.add('open');
+
+		setTimeout(() => {
+			popUp.correct.classList.remove('open');
+		}, 4000);
 
 		if (team === 'red') {
 			socket.emit(
@@ -93,14 +106,22 @@ const checkAwnser = (message, roomNumber, team, socket) => {
 	}
 };
 
+const log = (message) => {
+	const bot_message = document.createElement('li');
+	bot_message.textContent = message;
+	bot_message.classList.add('log');
+
+	if (chat.messages) chat.messages.appendChild(bot_message);
+};
+
 function addMessageElement(message, roomNumber, team, socket) {
 	const chat_message = document.createElement('li');
 	chat_message.innerHTML = `<p class=${team} >${message.username} <span>${message.time}</span> <p>
 		<p class='test'>${message.text}</p>`;
 
-	checkAwnser(message, roomNumber, socket);
+	checkAwnser(message, roomNumber, team, socket);
 
-	if (message.username === host) {
+	if (message.username === hostName) {
 		chat_message.classList.add('host');
 	} else {
 		chat_message.classList.add('guest');
@@ -118,31 +139,29 @@ function addMessageElement(message, roomNumber, team, socket) {
 	}
 }
 
-function updateTimer(time, id, socket) {
-	console.log('updateTimer');
-	console.log(time);
+function updateTimer(time, id, room, socket) {
 	if (time <= 0) {
-		clearInterval(id);
+		time = currentSeconds;
+		timer.classList.remove('contdown');
+		popUp.timeUp.classList.add('open');
+
+		setTimeout(() => {
+			clearInterval(id);
+			popUp.timeUp.classList.remove('open');
+			socket.emit('newRound', room);
+			io.in(room).emit('newRound', room);
+		}, 4000);
 	}
+
 	timer.textContent = time;
 	if (time < 10) {
 		timer.classList.add('contdown');
-	} else {
-		timer.classList.remove('contdown');
 	}
 }
 
-const log = (message) => {
-	const bot_message = document.createElement('li');
-	bot_message.textContent = message;
-	bot_message.classList.add('log');
-
-	if (chat.messages) chat.messages.appendChild(bot_message);
-};
-
 socket
 	.on('message', (message, roomNumber, team) => {
-		let botMessage = message.username.includes('Bot');
+		let botMessage = message.username.includes(' Bot');
 		if (botMessage) {
 			log(message.text);
 			return;
@@ -163,14 +182,27 @@ socket
 		socket.emit('newRound', room);
 	})
 
-	.on('startTimer', (start) => {
+	.on('startGame', () => {
+		// currentSeconds = time;
+		startBtn.classList.add('hidden');
+		startPlaceholder.classList.add('hidden');
+
+		// socket.on('changeTimer', (time) => {
+		// 	currentSeconds = time;
+		// 	timer.textContent = time;
+		// });
+	})
+
+	.on('startTimer', (room, settingSecondes, start) => {
+		chat.leave.classList.remove('hidden');
 		if (start) {
-			// startTimer(30, socket);
+			
+			if (settingSecondes !== 0) time = settingSecondes;
 
 			let id = setInterval(() => {
 				//Update view every 1s
 				time -= 1;
-				updateTimer(time, id, socket);
+				updateTimer(time, id, room, socket);
 			}, 1000);
 		}
 	})
@@ -179,16 +211,14 @@ socket
 		console.log('roomUsers');
 		console.log(data);
 		updateParticipantsAmount(data.users);
-	})
 
-	.on('playerTeam', (team) => {
-		console.log('lkkklbsbljdabe' + team);
-		if (chat.send) chat.send.setAttribute('data-team', team);
+		// ROOM USERS NOT WORKING
 	})
 
 	.on('roomExists', (exist, player) => {
 		if (exist) {
 			socket.emit('joinRoom', player, 'guest');
+			if (chat.send) chat.send.setAttribute('data-team', player.team);
 			guest.form.submit();
 		} else {
 			popUp.notValid.classList.remove('hidden');
@@ -198,18 +228,18 @@ socket
 		}
 	});
 
-if (start.form) {
-	start.form.addEventListener('submit', (event) => {
+if (host.form) {
+	host.form.addEventListener('submit', (event) => {
 		// event.preventDefault();
-		console.log(event);
+		
 		// Whenever the server emits 'user joined', log it in the chat body
-		if (start.name.value) {
+		if (host.name.value) {
 			let number = event.target
 				.querySelector('button')
 				.getAttribute('data-room');
 			const player = {
-				name: start.name.value,
-				team: start.team.value,
+				name: host.name.value,
+				team: host.team.value,
 				room: number,
 			};
 
@@ -229,7 +259,7 @@ if (start.form) {
 			};
 
 			socket.emit('checkRoom', player, 'guest');
-			socket.emit('newRound', player.room);
+			// socket.emit('newRound', player.room);
 		}
 	});
 
@@ -244,11 +274,7 @@ if (start.form) {
 
 if (chat.leave) {
 	chat.leave.addEventListener('click', (event) => {
-		const player = {
-			name: event.target.getAttribute('data-host'),
-			room: event.target.getAttribute('data-room'),
-			canLeave: true,
-		};
+
 		socket.emit('leaving', true);
 		window.location.href = '/';
 	});
@@ -259,7 +285,7 @@ if (chat.leave) {
 			.querySelector('button')
 			.getAttribute('data-host');
 
-		host = user_name;
+		hostName = user_name;
 
 		if (chat.input.value) {
 			const chat_bolb = {
@@ -279,7 +305,24 @@ if (chat.leave) {
 			chat.input.focus();
 		}
 	});
+
+	if (startBtn) {
+		startBtn.addEventListener('click', () => {
+			startBtn.classList.add('hidden');
+			let roomNumber = startBtn.getAttribute('data-room');
+			socket.emit('startGame', roomNumber);
+		});
+	}
 }
+
+settings.form.addEventListener('submit', (event) => {
+	event.preventDefault();
+
+	const timerSeconnds = event.target.querySelector('input[type=number]').value;
+	socket.emit('changeTimer', timerSeconnds);
+
+	// FEEDBACK GEVEN DAT HET IS AANGEPAST
+});
 
 settings.button.addEventListener('click', () => {
 	settings.frame.classList.add('visible');

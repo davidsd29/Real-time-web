@@ -2,10 +2,20 @@
 	{{!-- <h1 class="titile title__small">ROOM: {{room_number}}</h1> --}}
 	<h1 class='text text__titile'>ROOM: {{room_number}}</h1>
 
-	<div>
+	<div class='scores hidden'>
 		<p class='title title__small'>TEAM RED <span data-blue-points>0</span></p>
 		<p class='title title__small'>TEAM BLUE <span data-red-points>0</span></p>
 	</div>
+
+	{{#if host}}
+		<button
+			class='title title__small'
+			data-start-game
+			data-room='{{room_number}}'
+		>START GAME</button>
+	{{else}}
+		<p class="placeholder text text__big" data-start-placeholder>Waiting for host...</p>
+	{{/if}}
 
 	<nav class='desktop'>
 		<ul>
@@ -14,9 +24,9 @@
 					data-host='{{user_name}}'
 					data-room='{{room_number}}'
 					data-leave
-				>Stop Game</button></li>
+				>Leave Game</button></li>
 			<li>
-				<button class='text text__bold btn' data-setting-btn>
+				<button class='text text__bold btn' data-settings-btn>
 					<i class='fa fa-gear'></i>
 					<span>Settings</span>
 				</button>
