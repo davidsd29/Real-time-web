@@ -2,7 +2,7 @@ const users = [];
 
 // Join user to chat
 function userJoin(id, username, room, team) {
-	if (team === undefined) {
+	if (team === undefined || team === null) {
 		const blueTeam = users.filter((user) => user.team === 'blue');
 		const redTeam = users.filter((user) => user.team === 'red');
 		const teams = ['blue', 'red'];

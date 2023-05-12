@@ -36,7 +36,6 @@ import game from './routes/game.js';
 
 // HBS Setup
 import { engine } from 'express-handlebars';
-import { Console } from 'console';
 
 app.engine(
 	'hbs',
@@ -63,22 +62,30 @@ let settingsSeconds = 0;
 io.on('connection', (socket) => {
 	console.log('a user connected');
 
-	socket.on('joinRoom', (player, type) => {
+	socket.on('joinRoom', (player) => {
 		console.log('player join', player);
 
 		const rooms = getRoomNumbers();
-		if (type === 'host') {
-			if (rooms.includes(player.room)) {
+		console.log(rooms);
+		if (player.type === 'host') {
+			if (rooms.includes(player.roomID)) {
 				console.log('room already exists, new room number generated');
-				player.room = (Math.floor(Math.random() * 10000) + 10000)
+				player.roomID = (Math.floor(Math.random() * 10000) + 10000)
 					.toString()
 					.substring(1);
 			}
+		} else {
+			if (!rooms.includes(player.roomID)) {
+				console.log('room does not exist');
+				socket.emit('roomExists', false, player);
+				return;
+			}
 		}
 
-		const user = userJoin(socket.id, player.name, player.room, player.team);
-
+		const user = userJoin(socket.id, player.name, player.roomID, player.team);
 		socket.join(user.room);
+
+		io.in(user.room).emit('opa', 'opa');
 
 		// Welcome current user
 		socket.emit(
@@ -88,16 +95,11 @@ io.on('connection', (socket) => {
 
 		// broadcast globally (all clients) that a person has connected to a specific room
 		socket.broadcast
-			// .to(user.room)
+			.to(user.room)
 			.emit(
 				'message',
 				formatMessage(botName, `${user.username} has joined the chat`)
 			);
-
-		// io.to(user.room).emit(
-		// 	'message',
-		// 	formatMessage(botName, `${user.username} has joined the chat`)
-		// );
 
 		// Send users and room info
 		// io.to(user.room).emit('roomUsers', {
@@ -106,20 +108,20 @@ io.on('connection', (socket) => {
 		// });
 	});
 
-	socket.on('checkRoom', (player) => {
+	socket.on('checkRoom', (number) => {
 		const rooms = getRoomNumbers();
 
-		if (rooms.includes(player.room)) {
-			socket.emit('roomExists', true, player);
+		if (rooms.includes(number)) {
+			socket.emit('roomExists', true);
 		} else {
 			console.log('room does not exist');
-			socket.emit('roomExists', false, player);
+			socket.emit('roomExists', false);
 		}
 	});
 
 	socket.on('correctAnswer', (room, team, points) => {
-		socket.broadcast.emit('sendPoints', team, points);
-		// io.to(room).emit('sendPoints',room, team, points);
+		// socket.broadcast.emit('sendPoints', team, points);
+		io.to(room).emit('sendPoints',room, team, points);
 	});
 
 	socket.on('drawing', (drawLine) => {
@@ -145,19 +147,19 @@ io.on('connection', (socket) => {
 		// history.push(message)
 		console.log('dit is room' + message.room);
 
-		io.emit(
-			'message',
-			formatMessage(message.user, message.text),
-			message.room,
-			message.team
-		);
-
-		// io.in(message.room).emit(
+		// io.emit(
 		// 	'message',
 		// 	formatMessage(message.user, message.text),
 		// 	message.room,
 		// 	message.team
 		// );
+
+		io.in(message.room).emit(
+			'message',
+			formatMessage(message.user, message.text),
+			message.room,
+			message.team
+		);
 	});
 
 	socket.on('startGame', (room) => {
@@ -165,8 +167,8 @@ io.on('connection', (socket) => {
 	});
 
 	socket.on('startTimer', (room, started) => {
-		// io.in(room).emit('startTimer', true);
-		io.emit('startTimer', started);
+		io.in(room).emit('startTimer', started);
+		// io.emit('startTimer', started);
 	});
 
 	socket.on('changeTimer', (time) => {
@@ -182,8 +184,8 @@ io.on('connection', (socket) => {
 		const user = getCurrentUser(socket.id, leaving);
 		if (user.length > 0) {
 			console.log('user disconnected ' + socket.id);
-			socket.broadcast.emit(
-				// io.to(user.room).emit(
+			// socket.broadcast.emit(
+			io.to(user.room).emit(
 				'message',
 				formatMessage(botName, `${user[0].username} has left the chat`)
 			);

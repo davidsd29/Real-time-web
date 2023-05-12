@@ -4,9 +4,21 @@ let socket = io();
 let hostName = '';
 let time = 30;
 let currentSeconds = 0;
+let roomValid = false;
+
 
 const welcome_frame = document.querySelector('[data-welcome]');
 const drawWord = document.querySelector('[data-draw-word]');
+
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+
+const player = {
+	name: urlParams.get('username'),
+	roomID: urlParams.get('number'),
+	team: urlParams.get('team'),
+	type: urlParams.get('type'),
+};
 
 const chat = {
 	send: document.querySelector('#chat button'),
@@ -106,6 +118,11 @@ const checkAwnser = (message, roomNumber, team, socket) => {
 	}
 };
 
+if (player.roomID) {
+	console.log(player);
+	socket.emit('joinRoom', player);
+}
+
 const log = (message) => {
 	const bot_message = document.createElement('li');
 	bot_message.textContent = message;
@@ -181,6 +198,10 @@ socket
 		socket.emit('newRound', room);
 	})
 
+	.on('opa', (message) => {
+		console.log(message + ' opa');
+	})
+
 	.on('startGame', (activePlayer) => {
 		if (activePlayer) {
 			currentSeconds = time;
@@ -219,37 +240,34 @@ socket
 		// ROOM USERS NOT WORKING
 	})
 
-	.on('roomExists', (exist, player) => {
-		if (exist) {
-			socket.emit('joinRoom', player, 'guest');
-			if (chat.send) chat.send.setAttribute('data-team', player.team);
-			guest.form.submit();
+	.on()
+
+	.on('roomExists', (exist) => {
+		if (!exist) {
+			roomValid = false;
+
+			if (popUp.notValid) {
+				popUp.notValid.classList.remove('hidden');
+				setTimeout(() => {
+					popUp.notValid.classList.add('hidden');
+				}, 4000);
+			}
 		} else {
-			popUp.notValid.classList.remove('hidden');
-			setTimeout(() => {
-				popUp.notValid.classList.add('hidden');
-			}, 4000);
+			roomValid = true;
+			console.log('room valid');
+			guest.form.submit();
 		}
 	});
 
 if (host.form) {
-	host.form.addEventListener('submit', (event) => {
-		// event.preventDefault();
+	host.submit.addEventListener('click', (event) => {
+		event.preventDefault();
 
+		let number = host.submit.getAttribute('data-room');
 		// Whenever the server emits 'user joined', log it in the chat body
 		if (host.name.value) {
-			let number = event.target
-				.querySelector('button')
-				.getAttribute('data-room');
-			const player = {
-				name: host.name.value,
-				team: host.team.value,
-				room: number,
-			};
-
-			console.log('joinRoom', player);
-			// socket.emit('newRound', player.room);
-			socket.emit('joinRoom', player, 'host');
+			host.form.action = `/game/room?number=${number}&username=${host.name.value}&team=${host.team.value}&type=host`;
+			host.form.submit();
 		}
 	});
 
@@ -257,13 +275,8 @@ if (host.form) {
 		event.preventDefault();
 		// Whenever the server emits 'user joined', log it in the chat body
 		if (guest.name.value && guest.room.value) {
-			const player = {
-				name: guest.name.value,
-				room: guest.room.value,
-			};
-
-			socket.emit('checkRoom', player, 'guest');
-			// socket.emit('newRound', player.room);
+			guest.form.action = `/game/guest/room?number=${guest.room.value}&username=${guest.name.value}&type=guest`;
+			socket.emit('checkRoom', guest.room.value);
 		}
 	});
 

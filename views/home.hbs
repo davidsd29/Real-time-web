@@ -12,7 +12,7 @@
         faucibus mi, non ornare massa lacus id felis. Praesent vitae ultricies enim.
     </p>
 
-    <form id="host_form" action="/game/{{roomNumber}}">
+    <form id="host_form">
         <h2 class="text text__titile">Choose your team...</h2>
         <fieldset>
             <label>
@@ -24,9 +24,11 @@
                 Blue
                 <input type="radio" name="team" id="blue" value="blue" required>
             </label>
-        </fieldset>
+        </fieldset> 
+        <input type="hidden" name="number" value="{{roomNumber}}">
+        <input type="hidden" name="type" value="host">
 
-        <input type="text" id="user_name" name="user_name" placeholder="Please enter your name" required autocomplete="off">
+        <input type="text" id="user_name" name="username" placeholder="Please enter your name" required autocomplete="off">
         <button type="submit" class="btn" data-room="{{roomNumber}}">Join</button>
     </form>
     

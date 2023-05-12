@@ -4,11 +4,12 @@
 
 		<input
 			type='number'
-			name='room_nmbr'
+			name='number'
 			placeholder='Enter the room number'
 			required
 		/>
-		<input type='text' name='guest' placeholder='Enter your name' required />
+		<input type='hidden' name='type' value='guest' />
+		<input type='text' name='username' placeholder='Enter your name' required />
         <p class="nonvalid hidden" data-notvalid>The room does not exist, please create your own room or try again.</p>
 
 		<fieldset>
