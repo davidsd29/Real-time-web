@@ -141,14 +141,13 @@ function addMessageElement(message, roomNumber, team, socket) {
 
 function updateTimer(time, id, room, socket) {
 	if (time <= 0) {
-		time = currentSeconds;
+		clearInterval(id);
 		timer.classList.remove('contdown');
 		popUp.timeUp.classList.add('open');
 
 		setTimeout(() => {
-			clearInterval(id);
 			popUp.timeUp.classList.remove('open');
-			socket.emit('newRound', room);
+			io.emit('newRound', room);
 			io.in(room).emit('newRound', room);
 		}, 4000);
 	}
@@ -182,22 +181,27 @@ socket
 		socket.emit('newRound', room);
 	})
 
-	.on('startGame', () => {
-		// currentSeconds = time;
-		startBtn.classList.add('hidden');
-		startPlaceholder.classList.add('hidden');
+	.on('startGame', (activePlayer) => {
+		if (activePlayer) {
+			currentSeconds = time;
+			startBtn.classList.add('hidden');
+			startPlaceholder.classList.add('hidden');
 
-		// socket.on('changeTimer', (time) => {
-		// 	currentSeconds = time;
-		// 	timer.textContent = time;
-		// });
+			// socket.on('changeTimer', (time) => {
+			// 	currentSeconds = time;
+			// 	timer.textContent = time;
+			// });
+		}
 	})
 
 	.on('startTimer', (room, settingSecondes, start) => {
 		chat.leave.classList.remove('hidden');
 		if (start) {
-			
-			if (settingSecondes !== 0) time = settingSecondes;
+			if (settingSecondes !== 0) {
+				time = settingSecondes;
+			} else {
+				time = currentSeconds;
+			}
 
 			let id = setInterval(() => {
 				//Update view every 1s
@@ -231,7 +235,7 @@ socket
 if (host.form) {
 	host.form.addEventListener('submit', (event) => {
 		// event.preventDefault();
-		
+
 		// Whenever the server emits 'user joined', log it in the chat body
 		if (host.name.value) {
 			let number = event.target
@@ -274,7 +278,6 @@ if (host.form) {
 
 if (chat.leave) {
 	chat.leave.addEventListener('click', (event) => {
-
 		socket.emit('leaving', true);
 		window.location.href = '/';
 	});

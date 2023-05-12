@@ -202,6 +202,7 @@ article {
 	> div:last-of-type {
 		position: relative;
 		display: flex;
+		justify-content: center;
 		height: 90%;
 		max-height: 70vh;
 
@@ -287,6 +288,7 @@ article {
 			flex-grow: 3;
 			// height: initial;
 			// width: 100%;
+			max-width: 800px;
 			border-radius: 0 0.4em 0.4em 0;
 			background-color: color(quaternary);
 			border: 2px solid color(secondary);

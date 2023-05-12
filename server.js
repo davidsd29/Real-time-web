@@ -87,14 +87,13 @@ io.on('connection', (socket) => {
 		);
 
 		// broadcast globally (all clients) that a person has connected to a specific room
-		socket
-			.to(user.room)
+		socket.broadcast
+			// .to(user.room)
 			.emit(
 				'message',
 				formatMessage(botName, `${user.username} has joined the chat`)
 			);
 
-		console.log('room ' + user.room);
 		// io.to(user.room).emit(
 		// 	'message',
 		// 	formatMessage(botName, `${user.username} has joined the chat`)
