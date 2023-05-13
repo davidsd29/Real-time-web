@@ -6,7 +6,6 @@ let time = 30;
 let currentSeconds = 0;
 let roomValid = false;
 
-
 const welcome_frame = document.querySelector('[data-welcome]');
 const drawWord = document.querySelector('[data-draw-word]');
 
@@ -69,6 +68,7 @@ const popUp = {
 	correct: document.querySelector('[data-popup-correct]'),
 	timeUp: document.querySelector('[data-popup-timeUp]'),
 	notValid: document.querySelector('[data-notValid]'),
+	error: document.querySelector('[data-popup-error]'),
 };
 
 const timer = document.querySelector('[data-timer]');
@@ -157,15 +157,14 @@ function addMessageElement(message, roomNumber, team, socket) {
 }
 
 function updateTimer(time, id, room, socket) {
-	if (time <= 0) {
+	if (time < 0) {
 		clearInterval(id);
 		timer.classList.remove('contdown');
 		popUp.timeUp.classList.add('open');
 
 		setTimeout(() => {
 			popUp.timeUp.classList.remove('open');
-			io.emit('newRound', room);
-			io.in(room).emit('newRound', room);
+			socket.emit('newRound', room);
 		}, 4000);
 	}
 
@@ -202,22 +201,26 @@ socket
 		console.log(message + ' opa');
 	})
 
-	.on('startGame', (activePlayer) => {
-		if (activePlayer) {
-			currentSeconds = time;
-			startBtn.classList.add('hidden');
-			startPlaceholder.classList.add('hidden');
+	.on('playerAmount', () => {
+		console.log('notEnoughPlayers');
+			popUp.error.classList.add('open');
+			setTimeout(() => {
+				popUp.error.classList.remove('open');
+			}, 4000);
+	})
 
-			// socket.on('changeTimer', (time) => {
-			// 	currentSeconds = time;
-			// 	timer.textContent = time;
-			// });
-		}
+	.on('startGame', (player, randomWord) => {
+		console.log('startGame');
+
 	})
 
 	.on('startTimer', (room, settingSecondes, start) => {
 		chat.leave.classList.remove('hidden');
 		if (start) {
+			currentSeconds = time;
+			if (startBtn) startBtn.classList.add('hidden');
+			if (startPlaceholder) startPlaceholder.classList.add('hidden');
+
 			if (settingSecondes !== 0) {
 				time = settingSecondes;
 			} else {
@@ -324,7 +327,6 @@ if (chat.leave) {
 
 	if (startBtn) {
 		startBtn.addEventListener('click', () => {
-			startBtn.classList.add('hidden');
 			let roomNumber = startBtn.getAttribute('data-room');
 			socket.emit('startGame', roomNumber);
 		});

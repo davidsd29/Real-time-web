@@ -147,13 +147,6 @@ io.on('connection', (socket) => {
 		// history.push(message)
 		console.log('dit is room' + message.room);
 
-		// io.emit(
-		// 	'message',
-		// 	formatMessage(message.user, message.text),
-		// 	message.room,
-		// 	message.team
-		// );
-
 		io.in(message.room).emit(
 			'message',
 			formatMessage(message.user, message.text),
@@ -198,11 +191,12 @@ function newRound(socket, room) {
 		let activePlayer = chooseActivePlayer(room); // Make a new active player randomly
 		const randomWord = pickRandomWord();
 		console.log(settingsSeconds);
-		socket.broadcast.emit('startTimer', room, settingsSeconds, true);
-		socket.to(room).emit('startTimer', room, settingsSeconds, true);
+		// socket.broadcast.emit('startTimer', room, settingsSeconds, true);
+		io.to(room).emit('startTimer', room, settingsSeconds, true);
 		console.log('De actieve speler is: ', activePlayer);
-		io.emit('startGame', activePlayer, randomWord);
+		io.to(room).emit('startGame', activePlayer, randomWord);
 	} else {
+		socket.emit('playerAmount');
 		console.log('Not enough players');
 	}
 }
