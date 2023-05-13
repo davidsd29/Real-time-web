@@ -102,10 +102,10 @@ io.on('connection', (socket) => {
 			);
 
 		// Send users and room info
-		// io.to(user.room).emit('roomUsers', {
-		// 	room: user.room,
-		// 	users: getRoomUsers(user.room),
-		// });
+		io.to(user.room).emit('roomUsers', {
+			room: user.room,
+			users: getRoomUsers(user.room),
+		});
 	});
 
 	socket.on('checkRoom', (number) => {
@@ -128,7 +128,7 @@ io.on('connection', (socket) => {
 		io.emit('draw', drawLine);
 	});
 
-	socket.on('startDrawing', (coordinations) => {
+	socket.on('startDrawing', (coordinations, room) => {
 		io.emit('startDrawing', coordinations);
 	});
 
@@ -190,11 +190,11 @@ function newRound(socket, room) {
 	if (getRoomUsers(room).length > 1) {
 		let activePlayer = chooseActivePlayer(room); // Make a new active player randomly
 		const randomWord = pickRandomWord();
-		console.log(settingsSeconds);
-		// socket.broadcast.emit('startTimer', room, settingsSeconds, true);
+		
 		io.to(room).emit('startTimer', room, settingsSeconds, true);
 		console.log('De actieve speler is: ', activePlayer);
 		io.to(room).emit('startGame', activePlayer, randomWord);
+		// socket.broadcast.emit('startGame', activePlayer, randomWord);
 	} else {
 		socket.emit('playerAmount');
 		console.log('Not enough players');

@@ -8,13 +8,20 @@ const brush = {
 	button: document.querySelector('[data-brush-btn]'),
 	option: document.querySelector('[data-brush-option]'),
 	frame: document.querySelector('[data-brush]'),
-};
-const canvasParent = document.querySelector('.drawspace last-child');
-const clientBtn = document.querySelector('[data-host]');
+} || {};
+const canvasParent = document.querySelector('.drawspace last-child') || {};
+const clientBtn = document.querySelector('[data-host]') || {};
 const canvas = document.querySelector('canvas');
 
-const canvasContex = canvas.getContext('2d');
-const drawWord = document.querySelector('[data-draw-word]');
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+
+const roomID = urlParams.get('number');
+
+
+let canvasContex;
+if (canvas) canvasContex = canvas.getContext('2d');
+const drawWord = document.querySelector('[data-draw-word]') || {};
 
 let currntColor = 'black';
 let isDrawing = false;
@@ -102,101 +109,99 @@ function throttle(callback, delay) {
 		}
 	};
 }
-
-brush.button.addEventListener('click', () => {
-	brush.option.classList.toggle('hidden');
-});
-
-brush.slider.addEventListener('input', () => {
-	brush.value.textContent = brush.slider.value;
-	lineWidth = brush.slider.value;
-});
-
-brush.color.forEach((pallet) => {
-	pallet.addEventListener('click', () => {
-		brush.color.forEach((c) => c.classList.remove('active'));
-		pallet.classList.add('active');
-
-		// Set the current color
-		currntColor = getComputedStyle(pallet)['background-color'];
-
-		console.log(getComputedStyle(pallet)['background-color']);
+if (canvas) {
+	brush.button.addEventListener('click', () => {
+		brush.option.classList.toggle('hidden');
 	});
-});
 
+	brush.slider.addEventListener('input', () => {
+		brush.value.textContent = brush.slider.value;
+		lineWidth = brush.slider.value;
+	});
+
+	brush.color.forEach((pallet) => {
+		pallet.addEventListener('click', () => {
+			brush.color.forEach((c) => c.classList.remove('active'));
+			pallet.classList.add('active');
+
+			// Set the current color
+			currntColor = getComputedStyle(pallet)['background-color'];
+
+			console.log(getComputedStyle(pallet)['background-color']);
+		});
+	});
+}
 // socket.on('drawWord', (answer) => {
 // 	word = answer;
 // });
 
-// export function assignControls(player, randomWord, socket) {
-socket.on('startGame', (player, randomWord) => {
-	canvasContex.clearRect(0, 0, canvas.width, canvas.height);
+export function assignControls(player, randomWord, socket) {
+	if (canvas) {
+		// socket.on('startGame', (player, randomWord) => {
+		canvasContex.clearRect(0, 0, canvas.width, canvas.height);
 
-	// let clients = io.sockets.adapter.rooms[player.room];
-	// console.log(clients);
-	console.log('Client name' + clientBtn.getAttribute('data-host'));
-	console.log('player id: ' + player.username);
-	const clientName = clientBtn.getAttribute('data-host');
+		// let clients = io.sockets.adapter.rooms[player.room];
+		// console.log(clients);
+		console.log('Client name' + clientBtn.getAttribute('data-host'));
+		console.log('player id: ' + player.username);
+		const clientName = clientBtn.getAttribute('data-host');
 
-	if (clientName === player.username) {
-		//if you are the player
-		console.log('you are the player');
-		mayDraw = true;
-		// Show the drawing options and answer
-		brush.pallet.classList.remove('hidden');
-		brush.frame.classList.remove('hidden');
-		console.log('word: ' + randomWord);
-		drawWord.textContent = `${randomWord}`.toUpperCase();
+		if (clientName === player.username) {
+			//if you are the player
+			console.log('you are the player');
+			mayDraw = true;
+			// Show the drawing options and answer
+			brush.pallet.classList.remove('hidden');
+			brush.frame.classList.remove('hidden');
+			console.log('word: ' + randomWord);
+			drawWord.textContent = `${randomWord}`.toUpperCase();
 
-		startDrawing = (event) => {
-			console.log(
-				'mouse starts at:  x:' + event.clientX,
-				' y: ' + event.clientY
-			);
+			startDrawing = (event) => {
+				console.log(
+					'mouse starts at:  x:' + event.clientX,
+					' y: ' + event.clientY
+				);
 
-			// socket.emit('startDrawing', [event.offsetX, event.offsetY]);
-			socket.emit('startDrawing', [
-				mouseCanvasLocation(event, 'x'),
-				mouseCanvasLocation(event, 'y'),
-			]);
-		};
+				socket.emit('startDrawing', [
+					mouseCanvasLocation(event, 'x'),
+					mouseCanvasLocation(event, 'y'),
+				]);
+			};
 
-		stopDrawing = (event) => {
-			// socket.emit('stopDrawing', [event.offsetX, event.offsetY]);
-			socket.emit('stopDrawing', [
-				mouseCanvasLocation(event, 'x'),
-				mouseCanvasLocation(event, 'y'),
-			]);
-		};
+			stopDrawing = (event) => {
+				socket.emit('stopDrawing',  [
+					mouseCanvasLocation(event, 'x'),
+					mouseCanvasLocation(event, 'y'),
+				]);
+			};
 
-		onMouseMove = (event) => {
-			if (!isDrawing) return;
-			// socket.emit('move', [event.offsetX, event.offsetY]);
-			socket.emit('move', [
-				mouseCanvasLocation(event, 'x'),
-				mouseCanvasLocation(event, 'y'),
-			]);
-		};
+			onMouseMove = (event) => {
+				if (!isDrawing) return;
+				socket.emit('move',  [
+					mouseCanvasLocation(event, 'x'),
+					mouseCanvasLocation(event, 'y'),
+				]);
+			};
 
-		// Add the option to draw
-		// canvas.addEventListener('mousedown', getMousePos);
-		canvas.addEventListener('mousedown', startDrawing, false);
-		canvas.addEventListener('mousemove', throttle(onMouseMove, 1), false);
-		canvas.addEventListener('mouseup', stopDrawing, false);
-		canvas.addEventListener('mouseout', stopDrawing, false);
-	} else {
-		mayDraw = false;
-		drawWord.textContent = 'Can you guess the word?';
-		// Remove the option to draw
-		canvas.removeEventListener('mousedown', startDrawing);
-		canvas.removeEventListener('mousemove', throttle(onMouseMove, 1));
-		canvas.removeEventListener('mouseup', stopDrawing);
-		canvas.removeEventListener('mouseout', stopDrawing);
+			// Add the option to draw
+			canvas.addEventListener('mousedown', startDrawing, false);
+			canvas.addEventListener('mousemove', throttle(onMouseMove, 1), false);
+			canvas.addEventListener('mouseup', stopDrawing, false);
+			canvas.addEventListener('mouseout', stopDrawing, false);
+		} else {
+			mayDraw = false;
+			drawWord.textContent = 'Can you guess the word?';
+			// Remove the option to draw
+			canvas.removeEventListener('mousedown', startDrawing);
+			canvas.removeEventListener('mousemove', throttle(onMouseMove, 1));
+			canvas.removeEventListener('mouseup', stopDrawing);
+			canvas.removeEventListener('mouseout', stopDrawing);
 
-		// Hide the drawing options and answer
-		if (brush.pallet.classList.contains('hidden')) return;
-		brush.frame.classList.add('hidden');
-		brush.pallet.classList.add('hidden');
+			// Hide the drawing options and answer
+			if (brush.pallet.classList.contains('hidden')) return;
+			brush.frame.classList.add('hidden');
+			brush.pallet.classList.add('hidden');
+		}
 	}
-});
-// }
+	// });
+}

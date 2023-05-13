@@ -1,4 +1,4 @@
-// import { assignControls } from './draw.js';
+import { assignControls } from './draw.js';
 
 let socket = io();
 let hostName = '';
@@ -79,11 +79,11 @@ setTimeout(() => {
 	if (welcome_frame !== null) welcome_frame.classList.remove('visible');
 }, 3000);
 
-const updateParticipantsAmount = (data) => {
-	if (data.participants_amount === 1) {
+const updateParticipantsAmount = (participants) => {
+	if (participants === 1) {
 		chat.participants.textContent = '1 friend online';
 	} else {
-		chat.participants.textContent = `${data.participants_amount} friends online`;
+		chat.participants.textContent = `${participants} friends online`;
 	}
 };
 
@@ -158,20 +158,20 @@ function addMessageElement(message, roomNumber, team, socket) {
 
 function updateTimer(time, id, room, socket) {
 	if (time < 0) {
+		time = 0;
 		clearInterval(id);
 		timer.classList.remove('contdown');
 		popUp.timeUp.classList.add('open');
 
 		setTimeout(() => {
 			popUp.timeUp.classList.remove('open');
+
 			socket.emit('newRound', room);
 		}, 4000);
-	}
-
-	timer.textContent = time;
-	if (time < 10) {
+	} else if (time < 10) {
 		timer.classList.add('contdown');
 	}
+	timer.textContent = time;
 }
 
 socket
@@ -203,23 +203,25 @@ socket
 
 	.on('playerAmount', () => {
 		console.log('notEnoughPlayers');
-			popUp.error.classList.add('open');
-			setTimeout(() => {
-				popUp.error.classList.remove('open');
-			}, 4000);
+		popUp.error.classList.add('open');
+		setTimeout(() => {
+			popUp.error.classList.remove('open');
+		}, 4000);
 	})
 
 	.on('startGame', (player, randomWord) => {
-		console.log('startGame');
-
+		// console.log('startGame');
+		// drawWord.textContent = randomWord;
+		assignControls(player, randomWord, socket);
+		if (startBtn) startBtn.classList.add('hidden');
+		if (startPlaceholder) startPlaceholder.classList.add('hidden');
+		points.teamRed.parentElement.classList.remove('hidden');
 	})
 
 	.on('startTimer', (room, settingSecondes, start) => {
 		chat.leave.classList.remove('hidden');
 		if (start) {
 			currentSeconds = time;
-			if (startBtn) startBtn.classList.add('hidden');
-			if (startPlaceholder) startPlaceholder.classList.add('hidden');
 
 			if (settingSecondes !== 0) {
 				time = settingSecondes;
@@ -235,15 +237,13 @@ socket
 		}
 	})
 
-	.on('roomUsers', (data) => {
-		console.log('roomUsers');
-		console.log(data);
-		updateParticipantsAmount(data.users);
+	.on('roomUsers', (room) => {
+		// minus 1 because of the host
+		const playerAmount = Array.from(room.users).length - 1;
+		updateParticipantsAmount(playerAmount);
 
 		// ROOM USERS NOT WORKING
 	})
-
-	.on()
 
 	.on('roomExists', (exist) => {
 		if (!exist) {
