@@ -18,13 +18,16 @@
 
 	label {
 		position: relative;
+		top: -18.13em;
 		display: block;
 		width: 2em;
 		padding: 0.6em 1em;
 		cursor: pointer;
-		background-color: lightgray;
+		background-color: #2700ff;
+		color: color(quaternary);
 		border-radius: 1em 0 0 1em;
-		margin-bottom: 71%;
+		border: 2px solid color(secondary);
+		border-right: none;
 
 		input {
 			visibility: hidden;
@@ -39,7 +42,7 @@
 
 			span {
 				position: absolute;
-				top: .2em;
+				top: 0.2em;
 				left: 3em;
 				background-color: red;
 				color: white;
@@ -63,17 +66,17 @@
 	height: 70vh;
 	padding: 1em;
 
-	background: rgba(255, 255, 255, 0.6);
 	backdrop-filter: blur(1rem);
 	border-radius: 0 0em 1em 1em;
-	border: 1px solid rgba(255, 255, 255, 0.2);
+	border: 2px solid color(secondary);
 	box-shadow: 0.8rem 0.8rem 1.6rem 0 rgba(206, 205, 205, 0.5),
 		-0.8rem -0.8rem 1.6rem 0 rgba(255, 255, 255, 0.5);
 
-	background-color: lightgray;
+	background-color: #2700ff;
 
 	p.text {
 		font-size: 2rem;
+		color: color(quaternary);
 	}
 
 	.log {
